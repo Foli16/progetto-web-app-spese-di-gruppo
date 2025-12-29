@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -35,13 +36,13 @@ public class Expense extends BaseEntity
         expPart.setExpense(this);
     }
 
-    public void setAmount(double amount, Map<String, Double> shares)
+    public void setAmount(double expenseAmount, Map<UUID, Double> shares)
     {
-        double comparison = 0;
-        for(String partName : shares.keySet())
-            comparison += shares.get(partName);
-        if(comparison != amount)
+        double shareAmount = 0;
+        for(UUID partId : shares.keySet())
+            shareAmount += shares.get(partId);
+        if(shareAmount != expenseAmount)
             throw new RuntimeException("Expense amount must be equal to shares amount");
-        this.amount = amount;
+        this.amount = expenseAmount;
     }
 }

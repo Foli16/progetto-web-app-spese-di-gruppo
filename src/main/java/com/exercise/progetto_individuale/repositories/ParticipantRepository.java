@@ -10,5 +10,5 @@ import com.exercise.progetto_individuale.entities.SpendingGroup;
 
 public interface ParticipantRepository extends JpaRepository<Participant, UUID>
 {
-    Optional<Participant> findParticipantByNameAndSpendingGroup(String name, SpendingGroup sg);
+    Optional<Participant> findParticipantByIdAndSpendingGroup(UUID id, SpendingGroup sg);
 }

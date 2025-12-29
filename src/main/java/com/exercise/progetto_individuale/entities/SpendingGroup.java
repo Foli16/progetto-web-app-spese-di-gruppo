@@ -10,11 +10,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class SpendingGroup extends BaseEntity
 {
     @NotBlank @NotNull
@@ -26,6 +28,11 @@ public class SpendingGroup extends BaseEntity
 
     @OneToMany(mappedBy = "spendingGroup", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Participant> participants = new HashSet<>();
+    
+    public SpendingGroup(String name)
+    {
+        this.name = name;
+    }
 
     public void addParticipant(Participant p)
     {

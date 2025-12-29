@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.exercise.progetto_individuale.dtos.InputExpenseDto;
-import com.exercise.progetto_individuale.dtos.InputGroupDto;
-import com.exercise.progetto_individuale.dtos.InputParticipantDto;
 import com.exercise.progetto_individuale.services.ExpenseService;
 import com.exercise.progetto_individuale.services.GroupService;
 
@@ -24,21 +22,21 @@ public class GroupController
     @Autowired
     private ExpenseService eServ;
 
-    @PostMapping("creategroup")
-    public void createNewGroup(@RequestBody InputGroupDto dto)
+    @PostMapping("create/{name}")
+    public void createNewGroup(@PathVariable String name)
     {
-        gServ.createGroup(dto);
+        gServ.createGroup(name);
     }
 
-    @PostMapping("addparticipant/{id}")
-    public void addParticipant(@PathVariable UUID id, @RequestBody InputParticipantDto dto)
+    @PostMapping("{groupId}/addparticipant/{participantName}")
+    public void addParticipant(@PathVariable UUID groupId, @PathVariable String participantName)
     {
-        gServ.addParticipant(id, dto);
+        gServ.addParticipant(groupId, participantName);
     }
 
-    @PostMapping("addexpense/{id}")
-    public void addExpense(@PathVariable UUID id, @RequestBody InputExpenseDto dto)
+    @PostMapping("{groupId}/addexpense")
+    public void addExpense(@PathVariable UUID groupId, @RequestBody InputExpenseDto dto)
     {
-        eServ.addExpense(id, dto);
+        eServ.addExpense(groupId, dto);
     }
 }

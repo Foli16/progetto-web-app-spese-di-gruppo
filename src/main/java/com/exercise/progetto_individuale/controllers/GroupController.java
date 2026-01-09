@@ -49,9 +49,12 @@ public class GroupController
     }
 
     @GetMapping("list")
-    public List<OutputGroupDto> getAuthenticatedGroupList()
+    public List<OutputGroupDto> getGroupList(@CookieValue(required = false) String token, @RequestBody(required = false) UUID[] participantIds)
     {
-        return gServ.getGroupList();
+        if(token != null)
+            return gServ.getUserGroupList(token);
+        else
+            return gServ.getLocalGroupList(participantIds);
     }
 
     // @GetMapping("list")

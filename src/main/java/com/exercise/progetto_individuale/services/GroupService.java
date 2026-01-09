@@ -112,12 +112,29 @@ public class GroupService
     //     sgRepo.save(sg);
     // }
 
-    public List<OutputGroupDto> getGroupList()
+    public List<OutputGroupDto> getUserGroupList(String token)
     {
-        List<OutputGroupDto> groupNames = new ArrayList<>();
-        for(SpendingGroup sg : sgRepo.findAll())
-            groupNames.add(convertoToDto(sg));
-        return groupNames;
+        if(token == null)
+            return null;
+        User u = uServ.findUserByToken(token);
+        List<OutputGroupDto> groups = new ArrayList<>();
+        for(GroupUser gUser : u.getGroups())
+            groups.add(convertoToDto(gUser.getSpendingGroup()));
+        return groups;
+    }
+
+    public List<OutputGroupDto> getLocalGroupList(UUID[] participantIds) //da aggiustare per non far uscire più volte lo stesso gruppo
+    {
+        List<OutputGroupDto> groups = new ArrayList<>();
+        for(UUID id : participantIds)
+        {
+            Optional<Participant> op = partRepo.findById(id);
+            if(op.isEmpty())
+                throw new RuntimeException("Could not find participant");
+            Participant p = op.get();
+            groups.add(convertoToDto(p.getSpendingGroup()));
+        }
+        return groups;
     }
 
     private OutputGroupDto convertoToDto(SpendingGroup sg)

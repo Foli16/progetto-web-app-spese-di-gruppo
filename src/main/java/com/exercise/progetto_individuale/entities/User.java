@@ -32,6 +32,11 @@ public class User extends BaseEntity implements UserDetails
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GroupUser> groups = new HashSet<>();
 
+    public void addGroup(GroupUser gUser)
+    {
+        groups.add(gUser);
+        gUser.setUser(this);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

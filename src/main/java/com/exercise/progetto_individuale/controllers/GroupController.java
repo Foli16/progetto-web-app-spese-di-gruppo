@@ -1,8 +1,11 @@
 package com.exercise.progetto_individuale.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.exercise.progetto_individuale.dtos.InputExpenseDto;
+import com.exercise.progetto_individuale.dtos.InputGroupDto;
+import com.exercise.progetto_individuale.dtos.OutputGroupDto;
 import com.exercise.progetto_individuale.services.ExpenseService;
 import com.exercise.progetto_individuale.services.GroupService;
 
 @RestController
-@RequestMapping("api/group")
+@RequestMapping("api/groups")
 public class GroupController
 {
     @Autowired
@@ -22,21 +27,36 @@ public class GroupController
     @Autowired
     private ExpenseService eServ;
 
-    @PostMapping("create/{name}")
-    public void createNewGroup(@PathVariable String name)
+    @PostMapping("create")
+    public UUID createNewGroup(@RequestBody InputGroupDto dto, @CookieValue(required = false) String token)
     {
-        gServ.createGroup(name);
+        if(token != null)
+            return gServ.createUserLinkedGroup(dto, token);
+        else
+            return gServ.createLocalGroup(dto);
     }
 
-    @PostMapping("{groupId}/addparticipant/{participantName}")
-    public void addParticipant(@PathVariable UUID groupId, @PathVariable String participantName)
-    {
-        gServ.addParticipant(groupId, participantName);
-    }
+    // @PostMapping("{groupId}/addparticipant/{participantName}")
+    // public void addParticipant(@PathVariable UUID groupId, @PathVariable String participantName)
+    // {
+    //     gServ.addParticipant(groupId, participantName);
+    // }
 
     @PostMapping("{groupId}/addexpense")
     public void addExpense(@PathVariable UUID groupId, @RequestBody InputExpenseDto dto)
     {
         eServ.addExpense(groupId, dto);
     }
+
+    @GetMapping("list")
+    public List<OutputGroupDto> getAuthenticatedGroupList()
+    {
+        return gServ.getGroupList();
+    }
+
+    // @GetMapping("list")
+    // public List<OutputGroupDto> getGroupList(@CookieValue(required = false) String token, @RequestBody(required = false) String[] participantIds)
+    // {
+    //     return gServ.getGroupList(token, participantIds);
+    // }
 }

@@ -33,7 +33,7 @@ public class GroupController
         if(token != null)
             return gServ.createUserLinkedGroup(dto, token);
         else
-            return gServ.createLocalGroup(dto);
+            return gServ.createGroup(dto).getId();
     }
 
     // @PostMapping("{groupId}/addparticipant/{participantName}")

@@ -2,6 +2,7 @@ package com.exercise.progetto_individuale.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,54 +35,7 @@ public class GroupService
     @Autowired
     private UserRepository uRepo;
 
-    public void createGroup(InputGroupDto dto, String token)
-    {
-        SpendingGroup sg = new SpendingGroup(dto.getName());
-        GroupUser gUser = null;
-        if(token != null) //se è loggato inizio a creare il collegamento
-        {
-            gUser = new GroupUser(true);
-        }
-        List<Participant> participants = new ArrayList<>();
-
-        String lastName = "";
-        int counter = 0;
-        for(ParticipantDto partDto : dto.getParticipants())
-        {
-            Participant p = new Participant(partDto.getName()); //se il name è blank o null darà eccezione in questo punto
-            participants.add(p);
-            if(lastName.equalsIgnoreCase(p.getName()))
-                throw new RuntimeException("Participant names must be unique within the group");
-            if(partDto.isFounder()) //se è loggato ed è indicato come founder collego l'attuale Participant al GroupUser
-            {
-                counter++;
-                if(token != null)
-                    gUser.setParticipant(p);
-            }
-            lastName = p.getName();
-        }
-        if(counter != 1)
-            throw new RuntimeException("There must be only one founder");
-        if(token != null)
-            gUser = gUserRepo.save(gUser);
-        participants = partRepo.saveAll(participants);
-        // sg = sgRepo.save(sg);
-
-        for(Participant p : participants) //aggiungo Partecipants allo SpendingGroup
-            sg.addParticipant(p);
-        sg = sgRepo.save(sg);
-
-        if(token != null) //se è loggato, ultimo il collegamento tra User e SpendingGroup
-        {
-            User u = uServ.findUserByToken(token);
-            u.addGroup(gUser);
-            sg.addUser(gUser);
-            uRepo.save(u);
-            sgRepo.save(sg);
-        }
-    }
-
-    public UUID createLocalGroup(InputGroupDto dto)
+    public Participant createGroup(InputGroupDto dto)
     {
         SpendingGroup sg = new SpendingGroup(dto.getName());
 
@@ -116,11 +70,25 @@ public class GroupService
                 founder = p;
         }
         sgRepo.save(sg);
-        return founder.getId();
+        return founder;
     }
 
     public UUID createUserLinkedGroup(InputGroupDto dto, String token)
     {
+        Participant myParticipant = createGroup(dto);
+
+        User u = uServ.findUserByToken(token);
+
+        GroupUser gUser = new GroupUser(true);
+        gUser = gUserRepo.save(gUser);
+
+        gUser.setParticipant(myParticipant);
+        u.addGroup(gUser);
+        myParticipant.getSpendingGroup().addUser(gUser);
+        uRepo.save(u);
+        sgRepo.save(myParticipant.getSpendingGroup());
+        gUserRepo.save(gUser);
+
         return null;
     }
 

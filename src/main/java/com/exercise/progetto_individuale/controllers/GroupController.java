@@ -1,6 +1,7 @@
 package com.exercise.progetto_individuale.controllers;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class GroupController
     }
 
     @GetMapping("list")
-    public List<OutputGroupDto> getGroupList(@CookieValue(required = false) String token, @RequestBody(required = false) UUID[] participantIds)
+    public List<OutputGroupDto> getGroupList(@CookieValue(required = false) String token, @RequestBody(required = false) Set<UUID> participantIds)
     {
         if(token != null)
             return gServ.getUserGroupList(token);

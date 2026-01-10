@@ -1,8 +1,10 @@
 package com.exercise.progetto_individuale.services;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,38 +41,7 @@ public class GroupService
     {
         SpendingGroup sg = new SpendingGroup(dto.getName());
 
-        List<Participant> participants = new ArrayList<>();
-
-        String lastName = "";
-        int counter = 0;
-        for(ParticipantDto partDto : dto.getParticipants())
-        {
-            if(partDto.getName().isBlank() || partDto.getName() == null)
-                throw new RuntimeException("Participants' name must not be blank");
-            Participant p = new Participant(partDto.getName());
-            if(lastName.equalsIgnoreCase(p.getName()))
-                throw new UniqueNameCostraintException();
-            if(partDto.isFounder())
-            {
-                counter++;
-                p.setFounder(partDto.isFounder());
-            }
-            lastName = p.getName();
-            participants.add(p);
-        }
-        if(counter != 1)
-            throw new RuntimeException("There must be one founder per group");
-        participants = partRepo.saveAll(participants);
-
-        Participant founder = null;
-        for(Participant p : participants)
-        {
-            sg.addParticipant(p);
-            if(p.isFounder())
-                founder = p;
-        }
-        sgRepo.save(sg);
-        return founder;
+        return createAndAddParticipants(dto.getParticipants(), sg);
     }
 
     public UUID createUserLinkedGroup(InputGroupDto dto, String token)
@@ -119,25 +90,67 @@ public class GroupService
         User u = uServ.findUserByToken(token);
         List<OutputGroupDto> groups = new ArrayList<>();
         for(GroupUser gUser : u.getGroups())
-            groups.add(convertoToDto(gUser.getSpendingGroup()));
+            groups.add(convertToDto(gUser.getSpendingGroup()));
         return groups;
     }
 
-    public List<OutputGroupDto> getLocalGroupList(UUID[] participantIds) //da aggiustare per non far uscire più volte lo stesso gruppo
+    public List<OutputGroupDto> getLocalGroupList(Set<UUID> participantIds)
     {
-        List<OutputGroupDto> groups = new ArrayList<>();
+        List<SpendingGroup> groupsToBeValidated = new ArrayList<>();
         for(UUID id : participantIds)
         {
             Optional<Participant> op = partRepo.findById(id);
             if(op.isEmpty())
-                throw new RuntimeException("Could not find participant");
-            Participant p = op.get();
-            groups.add(convertoToDto(p.getSpendingGroup()));
+                throw new RuntimeException("Could not find group related to this participant");
+            SpendingGroup sg = op.get().getSpendingGroup();
+            groupsToBeValidated.add(sg);
         }
-        return groups;
+        Set<SpendingGroup> groupSet = new HashSet<>(groupsToBeValidated);
+        if(groupSet.size() != groupsToBeValidated.size())
+            throw new RuntimeException("Something went wrong, local storage might be compromised");
+        List<OutputGroupDto> validatedGroups = new ArrayList<>();
+        for(SpendingGroup sg : groupSet)
+            validatedGroups.add(convertToDto(sg));
+        return validatedGroups;
     }
 
-    private OutputGroupDto convertoToDto(SpendingGroup sg)
+    private Participant createAndAddParticipants(List<ParticipantDto> dtos, SpendingGroup sg)
+    {
+        List<Participant> participants = new ArrayList<>();
+
+        String lastName = "";
+        int counter = 0;
+        for(ParticipantDto partDto : dtos)
+        {
+            if(partDto.getName() == null || partDto.getName().isBlank())
+                throw new RuntimeException("Participants' name must not be blank or null");
+            Participant p = new Participant(partDto.getName());
+            if(lastName.equalsIgnoreCase(p.getName()))
+                throw new UniqueNameCostraintException();
+            if(partDto.isFounder())
+            {
+                counter++;
+                p.setFounder(partDto.isFounder());
+            }
+            lastName = p.getName();
+            participants.add(p);
+        }
+        if(counter != 1)
+            throw new RuntimeException("There must be one founder per group");
+        participants = partRepo.saveAll(participants);
+
+        Participant myParticipant = null;
+        for(Participant p : participants)
+        {
+            sg.addParticipant(p);
+            if(p.isFounder())
+                myParticipant = p;
+        }
+        sgRepo.save(sg);
+        return myParticipant;
+    }
+
+    private OutputGroupDto convertToDto(SpendingGroup sg)
     {
         OutputGroupDto dto = new OutputGroupDto();
         dto.setName(sg.getName());

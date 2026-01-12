@@ -25,7 +25,7 @@ export class LocalParticipantService {
   }
 
   private load(): string[] {
-    return JSON.parse(localStorage.getItem(this.KEY) || '{}');
+    return JSON.parse(localStorage.getItem(this.KEY) || '[]');
   }
 
 }

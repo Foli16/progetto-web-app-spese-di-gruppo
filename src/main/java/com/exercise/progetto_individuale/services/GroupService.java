@@ -46,9 +46,9 @@ public class GroupService
 
     public UUID createUserLinkedGroup(InputGroupDto dto, String token)
     {
-        Participant myParticipant = createGroup(dto);
-
         User u = uServ.findUserByToken(token);
+        
+        Participant myParticipant = createGroup(dto);
 
         GroupUser gUser = new GroupUser(true);
         gUser = gUserRepo.save(gUser);

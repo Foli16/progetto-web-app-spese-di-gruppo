@@ -49,7 +49,7 @@ public class GroupController
         eServ.addExpense(groupId, dto);
     }
 
-    @GetMapping("list")
+    @PostMapping("list")
     public List<OutputGroupDto> getGroupList(@CookieValue(required = false) String token, @RequestBody(required = false) Set<UUID> participantIds)
     {
         if(token != null)

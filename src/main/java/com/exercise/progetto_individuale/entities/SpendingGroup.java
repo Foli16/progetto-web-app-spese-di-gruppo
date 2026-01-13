@@ -40,6 +40,12 @@ public class SpendingGroup extends BaseEntity
         p.setSpendingGroup(this);
     }
 
+    public void addUser(GroupUser gUser)
+    {
+        this.users.add(gUser);
+        gUser.setSpendingGroup(this);
+    }
+
     /* public void setTotalExpenses()
     {
         double expenses = 0;

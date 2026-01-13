@@ -1,0 +1,18 @@
+NOME DEL GRUPPO: <input [(ngModel)]="groupPost.name" />
+<br/>
+PARTECIPANTI:<br/> @for(p of groupPost.participants; track $index)
+{
+    @if(p.founder)
+    {
+        <input placeholder="Nome fondatore" [(ngModel)]="p.name"/>
+    }
+    @else
+    {
+        <input placeholder="Nome partecipante" [(ngModel)]="p.name"/><button (click)="removeParticipant($index)">X</button>
+    }
+    <br/>
+}
+<button (click)="addParticipant()" [disabled]="!fillCheck()">AGGIUNGI PARTECIPANTE</button>
+<br/>
+<br/>
+<button (click)="save()">SALVA</button>

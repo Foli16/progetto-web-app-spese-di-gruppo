@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './login-form.css',
 })
 export class LoginForm {
-  constructor(private serv:AuthService)
+  constructor(public serv:AuthService)
   {}
 
   cred = {email:"", password:""};

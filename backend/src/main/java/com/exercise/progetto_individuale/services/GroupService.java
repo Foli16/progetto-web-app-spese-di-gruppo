@@ -85,8 +85,8 @@ public class GroupService
 
     public List<OutputGroupDto> getUserGroupList(String token)
     {
-        if(token == null)
-            return null;
+        if(token == null || token.isBlank())
+            return new ArrayList<>();
         User u = uServ.findUserByToken(token);
         List<OutputGroupDto> groups = new ArrayList<>();
         for(GroupUser gUser : u.getGroups())
@@ -96,6 +96,8 @@ public class GroupService
 
     public List<OutputGroupDto> getLocalGroupList(Set<UUID> participantIds)
     {
+        if(participantIds == null || participantIds.isEmpty())
+            return new ArrayList<>();
         List<SpendingGroup> groupsToBeValidated = new ArrayList<>();
         for(UUID id : participantIds)
         {

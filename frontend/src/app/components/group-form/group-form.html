@@ -12,7 +12,7 @@ PARTECIPANTI:<br/> @for(p of groupPost.participants; track $index)
     }
     <br/>
 }
-<button (click)="addParticipant()" [disabled]="!fillCheck()">AGGIUNGI PARTECIPANTE</button>
+<button (click)="addParticipant()" [disabled]="!participantFillCheck()">AGGIUNGI PARTECIPANTE</button>
 <br/>
 <br/>
 <button (click)="save()">SALVA</button>

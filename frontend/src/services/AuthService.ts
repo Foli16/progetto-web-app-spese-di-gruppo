@@ -3,19 +3,25 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../model/User';
 import { CookieService } from 'ngx-cookie-service';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { GroupService } from './GroupService';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   
-  loggedUser:User | null = null;
-  authChecked = false;
 
-  constructor(private http:HttpClient, public router:Router) {
+  private userSubject = new BehaviorSubject<User | null | undefined>(undefined);
+  user$: Observable<User | null | undefined> = this.userSubject.asObservable();
+
+  constructor(private http:HttpClient, public router:Router, private serv:GroupService) {
       this.getUserInfo();
    }
 
+  get loggedUser(): User | null {
+    return this.userSubject.value ?? null;
+  }
 
   register(username:string, password:string)
   {
@@ -45,20 +51,20 @@ export class AuthService {
   getUserInfo()
   {
     this.http.get<User>("api/auth/userinformation").subscribe({
-      next: (user: User) =>
+      next: (user) =>
         {
-          this.loggedUser = user;
-          this.authChecked = true;
+          this.userSubject.next(user)
         },
       error: () =>
-        this.authChecked = true
+        this.userSubject.next(null)
       }
     );
   }
 
   logout()
   {
-    this.loggedUser = null;
+    this.userSubject.next(null);
+    this.serv.getGroupList();
     document.cookie = 'token=; Path=/api; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
   }
 }

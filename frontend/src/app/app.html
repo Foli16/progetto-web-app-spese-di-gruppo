@@ -1,2 +1,9 @@
+@if((serv.user$ | async) === undefined)
+{
+
+}
+@else 
+{
 <app-navbar></app-navbar>
 <router-outlet></router-outlet>
+}

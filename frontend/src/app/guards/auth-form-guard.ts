@@ -7,29 +7,15 @@ export const authFormGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const serv = inject(AuthService);
 
-  // if(!serv.authChecked)
-  // {
-  //   return false;
-  // }
-
-  // if(serv.loggedUser)
-  // {
-  //   router.navigate(["/"]);
-  //   alert("User already logged in");
-  //   return false;
-  // }
-
-  return true;
-
-  // return serv.loggedUser?.pipe(
-  //   filter(user => user !== undefined), // aspetta check auth
-  //   take(1),
-  //   map(user => {
-  //     if (user) {
-  //       router.navigate(['/']);
-  //       return false;
-  //     }
-  //     return true;
-  //   })
-  // );
+  return serv.user$.pipe( //concatena operatori
+    filter(user => user !== undefined), //scarta il valore undefined, ossia quello che ha user all'avvio 
+    take(1), //prende solo il primo valore passato
+    map(user => { //trasforma il valore passato in un boolean per la guard
+      if (user) {
+        router.navigate(['/']);
+        return false;
+      }
+      return true;
+    })
+  );
 };

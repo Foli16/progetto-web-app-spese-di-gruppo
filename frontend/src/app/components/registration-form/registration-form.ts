@@ -31,6 +31,6 @@ export class RegistrationForm {
 
   passwordCheck()
   {
-    return this.credentials.password == this.credentials.confirmPassword;
+    return this.credentials.password == this.credentials.confirmPassword && this.credentials.password != "" && this.credentials.confirmPassword != "";
   }
  }

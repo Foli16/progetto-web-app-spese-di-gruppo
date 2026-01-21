@@ -3,6 +3,10 @@ import { Router, type CanActivateFn } from '@angular/router';
 import { AuthService } from '../../services/AuthService';
 import { filter, map, take } from 'rxjs/operators';
 
+//Questa guard tiene controllato lo stato dell'utente, impedendo soprattutto l'accesso alle pagine
+//di login o registrazione da loggati quando le si apre digitando direttamente gli URL ad esse collegati nella barra di ricerca.
+//Per esempio se scrivo localhost:4200/login una guard senza questa logica permetterebbe l'accesso anche se si è già loggati.
+//Con questo codice invece la guard controlla lo stato dell'utente prima che Angular crei il componente.
 export const authFormGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const serv = inject(AuthService);

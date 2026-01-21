@@ -83,6 +83,11 @@ public class GroupService
     //     sgRepo.save(sg);
     // }
 
+    /**
+     * Questo metodo restituisce la lista di DTO dei gruppi collegati all'utente autenticato.
+     * @param token Il token per autenticare l'utente
+     * @return La lista di DTO dei gruppi collegati all'utente
+     */
     public List<OutputGroupDto> getUserGroupList(String token)
     {
         if(token == null || token.isBlank())
@@ -94,6 +99,17 @@ public class GroupService
         return groups;
     }
 
+    /**
+     * Questo metodo prende i gruppi "salvati" in locale. Nello specifico si occupa di ricevere un Set di
+     * ID di Participant, utilizzato poiché non possono esistere due ID uguali nella lista passata, e ottenerne i relativi
+     * SpendingGroup collegati. Siccome non possono esserci due o più ID di Participant legati allo stesso gruppo
+     * salvati in locale, perché causerebbe problemi nella corretta visualizzazione dei gruppi, viene fatto un
+     * controllo per evitare questa problematica che restituisce un eccezione nel caso il Local Storage sia stato manomesso manualmente.
+     * @param participantIds Il Set di ID di partecipanti salvati nel Local Storage del browser
+     * @return La lista di DTO dei gruppi collegati ai Participant il cui ID è salvato nel Local Storage del browser dell'utente
+     * @exception RuntimeException Lancia eccezione se risulta anche solo un participantId non esistente oppure
+     * se il Local Storage è stato manipolato inserendo dati incompatibili tra loro
+     */
     public List<OutputGroupDto> getLocalGroupList(Set<UUID> participantIds)
     {
         if(participantIds == null || participantIds.isEmpty())

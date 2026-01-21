@@ -13,8 +13,6 @@ import lombok.Setter;
 public class InputExpenseDto
 {
     private String title;
-    private double amount;
     private LocalDate date;
-    private UUID payerId;
-    private Map<UUID, Double> shares = new HashMap<>();
+    private Map<UUID, InputExpenseParticipantDto> expenseParticipants = new HashMap<>();
 }

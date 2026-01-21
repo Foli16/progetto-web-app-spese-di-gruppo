@@ -11,7 +11,7 @@ import lombok.Setter;
 @Entity
 public class ExpenseParticipant extends BaseEntity
 {
-    private boolean payer;
+    private double paidAmount;
     private double share;
 
     @ManyToOne(fetch = FetchType.LAZY)

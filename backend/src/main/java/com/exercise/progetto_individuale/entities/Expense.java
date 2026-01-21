@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.exercise.progetto_individuale.dtos.InputExpenseParticipantDto;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -36,13 +38,17 @@ public class Expense extends BaseEntity
         expPart.setExpense(this);
     }
 
-    public void setAmount(double expenseAmount, Map<UUID, Double> shares)
+    public void setAmount(Map<UUID, InputExpenseParticipantDto> expPart)
     {
-        double shareAmount = 0;
-        for(UUID partId : shares.keySet())
-            shareAmount += shares.get(partId);
-        if(shareAmount != expenseAmount)
-            throw new RuntimeException("Expense amount must be equal to shares amount");
-        this.amount = expenseAmount;
+        double totalShare = 0;
+        double totalPaid = 0;
+        for(UUID partId : expPart.keySet())
+        {
+            totalShare += expPart.get(partId).getShare();
+            totalPaid += expPart.get(partId).getPaidAmount();
+        }
+        if(totalShare != totalPaid)
+            throw new RuntimeException("Total share amount must be equal to total paid amount");
+        this.amount = totalShare;
     }
 }

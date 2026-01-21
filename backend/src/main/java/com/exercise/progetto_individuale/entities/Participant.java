@@ -45,4 +45,9 @@ public class Participant extends BaseEntity
         expenses.add(expPart);
         expPart.setParticipant(this);
     }
+
+    public void setBalance(double amountToAdd)
+    {
+        this.balance += amountToAdd;
+    }
 }

@@ -43,12 +43,12 @@ public class ExpenseService
         Expense exp = new Expense();
         exp.setTitle(dto.getTitle());
         exp.setDate(dto.getDate());
-        exp.setAmount(dto.getAmount(), dto.getShares());
-        for(UUID partId : dto.getShares().keySet())
+        exp.setAmount(dto.getExpenseParticipants());
+        for(UUID partId : dto.getExpenseParticipants().keySet())
         {
             Optional<Participant> pOp = partRepo.findParticipantByIdAndSpendingGroup(partId, sg);
             if(pOp.isEmpty())
-                throw new RuntimeException("Participant with id \"" + partId + "\" not existent or not present in group");
+                throw new RuntimeException("Participant with id '" + partId + "' not existent or not present in group");
             Participant p = pOp.get();
             createExpenseParticipant(p, exp, dto);
         }
@@ -57,11 +57,12 @@ public class ExpenseService
     private void createExpenseParticipant(Participant p, Expense exp, InputExpenseDto dto)
     {
         ExpenseParticipant expPart = new ExpenseParticipant();
-        expPart.setPayer(dto.getPayerId().equals(p.getId()) ? true : false);
-        expPart.setShare(dto.getShares().get(p.getId()));
+        expPart.setPaidAmount(dto.getExpenseParticipants().get(p.getId()).getPaidAmount());
+        expPart.setShare(dto.getExpenseParticipants().get(p.getId()).getShare());
         expPart = expParRepo.save(expPart);
         exp.addParticipant(expPart);
         p.addExpense(expPart);
+        p.setBalance(expPart.getPaidAmount() - expPart.getShare());
         expRepo.save(exp);
         partRepo.save(p);
     }

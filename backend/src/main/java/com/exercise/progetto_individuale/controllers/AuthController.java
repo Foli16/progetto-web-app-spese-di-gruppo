@@ -1,6 +1,8 @@
 package com.exercise.progetto_individuale.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.exercise.progetto_individuale.dtos.authentication.LoginDto;
 import com.exercise.progetto_individuale.dtos.authentication.RegisterDto;
+import com.exercise.progetto_individuale.dtos.authentication.UserDto;
 import com.exercise.progetto_individuale.services.UserService;
 
 import jakarta.servlet.http.Cookie;
@@ -40,5 +43,11 @@ public class AuthController
         cookie.setMaxAge(3600);
         cookie.setPath("/api");
         response.addCookie(cookie);
+    }
+
+    @GetMapping("/userinformation")
+    public UserDto getUserInfo(@CookieValue(required = false) String token)
+    {
+        return userService.getUserInfo(token);
     }
 }

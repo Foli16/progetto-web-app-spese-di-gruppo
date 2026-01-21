@@ -63,7 +63,9 @@ public class UserService {
         return op.get();
     }
 
-    public UserDto convertToUserDto(User u) {
+    public UserDto getUserInfo(String token) {
+        User u = findUserByToken(token);
+
         UserDto dto = new UserDto();
         dto.setUsername(u.getUsername());
         return dto;

@@ -1,0 +1,10 @@
+<input type="text" placeholder="Email" [(ngModel)]="credentials.email"/>
+<input type="password" placeholder="Password" [(ngModel)]="credentials.password"/>
+<input type="password" placeholder="Conferma Password" [(ngModel)]="credentials.confirmPassword"/>
+<br/>
+@if(credentials.password != "" && credentials.password != credentials.confirmPassword)
+{
+    <small style="color: red;">La password non corrisponde</small>
+}
+<br/>
+<button (click)="registration()" [disabled]="!passwordCheck()">Registrati</button>

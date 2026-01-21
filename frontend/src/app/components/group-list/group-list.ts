@@ -4,10 +4,10 @@ import { GroupService } from '../../../services/GroupService';
 @Component({
   selector: 'app-home',
   imports: [],
-  templateUrl: './Home.html',
-  styleUrl: './Home.css',
+  templateUrl: './group-list.html',
+  styleUrl: './group-list.css',
 })
-export class Home {
+export class GroupList {
     constructor(public serv:GroupService)
     {
       this.fillArray();

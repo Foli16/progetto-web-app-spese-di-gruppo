@@ -17,7 +17,7 @@ export class GroupForm {
 
   addParticipant()
   {
-    if(this.fillCheck())
+    if(this.participantFillCheck())
       this.groupPost.participants.push({name:"", founder:false});
   }
 
@@ -26,14 +26,24 @@ export class GroupForm {
     this.groupPost.participants.splice(index, 1);
   }
 
-  fillCheck()
+  participantFillCheck()
   {
     return this.groupPost.participants.every(p => p.name && p.name.trim().length > 0);
   }
 
+  fullCheck()
+  {
+    return this.participantFillCheck() && this.groupPost.name && this.groupPost.name.trim().length > 0;
+  }
+
   save()
   {
-    this.serv.createGroup(this.groupPost);
-    this.groupPost = {name:"", participants:[{name:"", founder: true}]};
+    if(this.fullCheck())
+    {
+      this.serv.createGroup(this.groupPost);
+      this.groupPost = {name:"", participants:[{name:"", founder: true}]};
+    }
+    else
+      alert("Compila tutti i campi prima di salvare");
   }
 }

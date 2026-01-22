@@ -52,6 +52,8 @@ public class ExpenseService
             Participant p = pOp.get();
             createExpenseParticipant(p, exp, dto);
         }
+        sg.addExpenseToTotal(exp.getAmount());
+        sgRepo.save(sg);
     }
 
     private void createExpenseParticipant(Participant p, Expense exp, InputExpenseDto dto)

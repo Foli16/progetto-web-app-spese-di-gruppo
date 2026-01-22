@@ -13,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +27,7 @@ public class Expense extends BaseEntity
     private String title;
     @Positive
     private double amount;
-    @NotNull
+    @NotNull @PastOrPresent
     private LocalDate date;
 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)

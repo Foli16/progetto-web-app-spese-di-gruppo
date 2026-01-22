@@ -1,4 +1,7 @@
 export interface SpendingGroupGet
 {
-    name:string
+    name:string,
+    totalExpenses:number,
+    myParticipantBalance:number,
+    myParticipantTotalExpenses:number
 }

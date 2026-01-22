@@ -95,7 +95,7 @@ public class GroupService
         User u = uServ.findUserByToken(token);
         List<OutputGroupDto> groups = new ArrayList<>();
         for(GroupUser gUser : u.getGroups())
-            groups.add(convertToDto(gUser.getSpendingGroup()));
+            groups.add(convertToUserGroupDto(gUser));
         return groups;
     }
 
@@ -128,7 +128,7 @@ public class GroupService
             throw new RuntimeException("Something went wrong, local storage might be compromised");
         List<OutputGroupDto> validatedGroups = new ArrayList<>();
         for(SpendingGroup sg : groupSet)
-            validatedGroups.add(convertToDto(sg));
+            validatedGroups.add(convertToLocalGroupDto(sg));
         return validatedGroups;
     }
 
@@ -168,16 +168,45 @@ public class GroupService
         return myParticipant;
     }
 
+    /**
+     * Questo metodo converte lo SpendingGroup in DTO prendendo come valore di myParticipantBalance (variabile di OutputGroupDto)
+     * il balance del Participant che è indicato come founder del gruppo, ossia il partecipante che rappresenta
+     * l'utente in locale.
+     * @param sg Lo SpendingGroup che si vuole convertire in DTO
+     * @return l'OutputGroupDto convertito
+     */
+    private OutputGroupDto convertToLocalGroupDto(SpendingGroup sg)
+    {
+        OutputGroupDto dto = convertToDto(sg);
+        dto.setMyParticipantBalance(sg.getMyParticipant().getBalance());
+        return dto;
+    }
+    
+    /**
+     * Questo metodo converte lo SpendingGroup in DTO prendendo come valore di myParticipantBalance (variabile di OutputGroupDto)
+     * il balance del Participant che è legato al GroupUser passato come parametro, ossia il partecipante che
+     * rappresente lo User autenticato.
+     * @param gUser il GroupUser legato al Participant rappresentante l'utente autenticato
+     * @return l'OutputGroupDto convertito
+     */
+    private OutputGroupDto convertToUserGroupDto(GroupUser gUser)
+    {
+        OutputGroupDto dto = convertToDto(gUser.getSpendingGroup());
+        dto.setMyParticipantBalance(gUser.getParticipant().getBalance());
+        return dto;
+    }
+    
     private OutputGroupDto convertToDto(SpendingGroup sg)
     {
         OutputGroupDto dto = new OutputGroupDto();
         dto.setName(sg.getName());
+        dto.setTotalExpenses(sg.getTotalExpenses());
         return dto;
     }
 
-//     private SpendingGroup convertDtoToEntity(InputGroupDto dto)
-//     {
-//         SpendingGroup sg = new SpendingGroup();
+    //     private SpendingGroup convertDtoToEntity(InputGroupDto dto)
+    //     {
+        //         SpendingGroup sg = new SpendingGroup();
 //         sg.setName(dto.getName());
 //         sg.setParticipants(dto.getPartecipants());
 //     }

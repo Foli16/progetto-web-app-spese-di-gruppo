@@ -46,11 +46,13 @@ public class SpendingGroup extends BaseEntity
         gUser.setSpendingGroup(this);
     }
 
-    /* public void setTotalExpenses()
+    public void addExpenseToTotal(double expense)
     {
-        double expenses = 0;
-        for(Participant p : participants)
-            expenses += p.getBalance();
-        this.totalExpenses = expenses;
-    } */
+        this.totalExpenses += expense;
+    }
+
+    public Participant getMyParticipant()
+    {
+        return this.participants.stream().filter(p -> p.isFounder()).findFirst().orElse(null);
+    }
 }

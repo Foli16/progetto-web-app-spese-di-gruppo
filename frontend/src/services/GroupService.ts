@@ -20,7 +20,7 @@ export class GroupService {
       next: (resp) => 
         {
           this.groups = resp;
-          this.groups.sort((a,b) => a.name.localeCompare(b.name));
+          this.groups.sort((a,b) => a.groupName.localeCompare(b.groupName));
         },
       error: (error) => alert(error)
     });

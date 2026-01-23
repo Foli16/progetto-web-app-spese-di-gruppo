@@ -10,13 +10,19 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.exercise.progetto_individuale.dtos.InputGroupDto;
-import com.exercise.progetto_individuale.dtos.OutputGroupDto;
-import com.exercise.progetto_individuale.dtos.ParticipantDto;
+import com.exercise.progetto_individuale.dtos.input_dtos.InputGroupDto;
+import com.exercise.progetto_individuale.dtos.input_dtos.InputParticipantDto;
+import com.exercise.progetto_individuale.dtos.output_dtos.OutputExpenseDto;
+import com.exercise.progetto_individuale.dtos.output_dtos.OutputExpenseParticipantDto;
+import com.exercise.progetto_individuale.dtos.output_dtos.OutputGroupDto;
+import com.exercise.progetto_individuale.dtos.output_dtos.OutputParticipantDto;
+import com.exercise.progetto_individuale.entities.Expense;
+import com.exercise.progetto_individuale.entities.ExpenseParticipant;
 import com.exercise.progetto_individuale.entities.GroupUser;
 import com.exercise.progetto_individuale.entities.Participant;
 import com.exercise.progetto_individuale.entities.SpendingGroup;
 import com.exercise.progetto_individuale.entities.User;
+import com.exercise.progetto_individuale.exceptions.LocalStorageErrorException;
 import com.exercise.progetto_individuale.exceptions.UniqueNameCostraintException;
 import com.exercise.progetto_individuale.repositories.GroupUserRepository;
 import com.exercise.progetto_individuale.repositories.ParticipantRepository;
@@ -36,6 +42,8 @@ public class GroupService
     private GroupUserRepository gUserRepo;
     @Autowired
     private UserRepository uRepo;
+
+    // METODI DI CREAZIONE GRUPPO
 
     public Participant createGroup(InputGroupDto dto)
     {
@@ -63,82 +71,13 @@ public class GroupService
         return null;
     }
 
-    // public void addParticipant(SpendingGroup sg, String participantName)
-    // {
-    //     Participant p = new Participant(participantName);
-    //     p = partRepo.save(p);
-    //     sg.addParticipant(p);
-    //     sgRepo.save(sg);
-    // }
-
-    // public void addParticipant(UUID id, String participantName)
-    // {
-    //     Optional<SpendingGroup> op = sgRepo.findById(id);
-    //     if(op.isEmpty())
-    //         throw new RuntimeException("Inexistent group");
-    //     SpendingGroup sg = op.get();
-    //     Participant p = new Participant(participantName);
-    //     p = partRepo.save(p);
-    //     sg.addParticipant(p);
-    //     sgRepo.save(sg);
-    // }
-
-    /**
-     * Questo metodo restituisce la lista di DTO dei gruppi collegati all'utente autenticato.
-     * @param token Il token per autenticare l'utente
-     * @return La lista di DTO dei gruppi collegati all'utente
-     */
-    public List<OutputGroupDto> getUserGroupList(String token)
-    {
-        if(token == null || token.isBlank())
-            return new ArrayList<>();
-        User u = uServ.findUserByToken(token);
-        List<OutputGroupDto> groups = new ArrayList<>();
-        for(GroupUser gUser : u.getGroups())
-            groups.add(convertToUserGroupDto(gUser));
-        return groups;
-    }
-
-    /**
-     * Questo metodo prende i gruppi "salvati" in locale. Nello specifico si occupa di ricevere un Set di
-     * ID di Participant, utilizzato poiché non possono esistere due ID uguali nella lista passata, e ottenerne i relativi
-     * SpendingGroup collegati. Siccome non possono esserci due o più ID di Participant legati allo stesso gruppo
-     * salvati in locale, perché causerebbe problemi nella corretta visualizzazione dei gruppi, viene fatto un
-     * controllo per evitare questa problematica che restituisce un eccezione nel caso il Local Storage sia stato manomesso manualmente.
-     * @param participantIds Il Set di ID di partecipanti salvati nel Local Storage del browser
-     * @return La lista di DTO dei gruppi collegati ai Participant il cui ID è salvato nel Local Storage del browser dell'utente
-     * @exception RuntimeException Lancia eccezione se risulta anche solo un participantId non esistente oppure
-     * se il Local Storage è stato manipolato inserendo dati incompatibili tra loro
-     */
-    public List<OutputGroupDto> getLocalGroupList(Set<UUID> participantIds)
-    {
-        if(participantIds == null || participantIds.isEmpty())
-            return new ArrayList<>();
-        List<SpendingGroup> groupsToBeValidated = new ArrayList<>();
-        for(UUID id : participantIds)
-        {
-            Optional<Participant> op = partRepo.findById(id);
-            if(op.isEmpty())
-                throw new RuntimeException("Could not find group related to this participant");
-            SpendingGroup sg = op.get().getSpendingGroup();
-            groupsToBeValidated.add(sg);
-        }
-        Set<SpendingGroup> groupSet = new HashSet<>(groupsToBeValidated);
-        if(groupSet.size() != groupsToBeValidated.size())
-            throw new RuntimeException("Something went wrong, local storage might be compromised");
-        List<OutputGroupDto> validatedGroups = new ArrayList<>();
-        for(SpendingGroup sg : groupSet)
-            validatedGroups.add(convertToLocalGroupDto(sg));
-        return validatedGroups;
-    }
-
-    private Participant createAndAddParticipants(List<ParticipantDto> dtos, SpendingGroup sg)
+    private Participant createAndAddParticipants(List<InputParticipantDto> dtos, SpendingGroup sg)
     {
         List<Participant> participants = new ArrayList<>();
 
         String lastName = "";
         int counter = 0;
-        for(ParticipantDto partDto : dtos)
+        for(InputParticipantDto partDto : dtos)
         {
             if(partDto.getName() == null || partDto.getName().isBlank())
                 throw new RuntimeException("Participants' name must not be blank or null");
@@ -168,46 +107,182 @@ public class GroupService
         return myParticipant;
     }
 
+    // public void addParticipant(SpendingGroup sg, String participantName)
+    // {
+    //     Participant p = new Participant(participantName);
+    //     p = partRepo.save(p);
+    //     sg.addParticipant(p);
+    //     sgRepo.save(sg);
+    // }
+
+    // public void addParticipant(UUID id, String participantName)
+    // {
+    //     Optional<SpendingGroup> op = sgRepo.findById(id);
+    //     if(op.isEmpty())
+    //         throw new RuntimeException("Inexistent group");
+    //     SpendingGroup sg = op.get();
+    //     Participant p = new Participant(participantName);
+    //     p = partRepo.save(p);
+    //     sg.addParticipant(p);
+    //     sgRepo.save(sg);
+    // }
+
+    // METODI GET PER I GRUPPI
+
     /**
-     * Questo metodo converte lo SpendingGroup in DTO prendendo come valore di myParticipantBalance (variabile di OutputGroupDto)
-     * il balance del Participant che è indicato come founder del gruppo, ossia il partecipante che rappresenta
-     * l'utente in locale.
+     * Questo metodo restituisce la lista di DTO dei gruppi collegati all'utente autenticato.
+     * @param token Il token per autenticare l'utente
+     * @return La lista di DTO dei gruppi collegati all'utente
+     */
+    public List<OutputGroupDto> getUserGroupList(String token)
+    {
+        if(token == null || token.isBlank())
+            return new ArrayList<>();
+        User u = uServ.findUserByToken(token);
+        List<OutputGroupDto> groups = new ArrayList<>();
+        for(GroupUser gUser : u.getGroups())
+            groups.add(convertToUserGroupPreviewDto(gUser));
+        return groups;
+    }
+
+    /**
+     * Questo metodo prende i gruppi "salvati" in locale. Nello specifico si occupa di ricevere un Set di
+     * ID di Participant, utilizzato poiché non possono esistere due ID uguali nella lista passata, e ottenerne i relativi
+     * SpendingGroup collegati. Siccome non possono esserci due o più ID di Participant legati allo stesso gruppo
+     * salvati in locale, perché causerebbe problemi nella corretta visualizzazione dei gruppi, viene fatto un
+     * controllo per evitare questa problematica che restituisce un eccezione nel caso il Local Storage sia stato manomesso manualmente.
+     * La stessa cosa succede se risulta anche solo un singolo ID di un partecipante che possiede una relazione con un GroupUser, poiché
+     * questo potrebbe causare problemi di sicurezza: i gruppi condivisi non possono essere visualizzati localmente.
+     * @param participantIds Il Set di ID di partecipanti salvati nel Local Storage del browser
+     * @return La lista di DTO dei gruppi collegati ai Participant il cui ID è salvato nel Local Storage del browser dell'utente
+     * @exception RuntimeException Lancia eccezione se risulta anche solo un participantId non esistente.
+     * @exception LocalStorageErrorException Lancia questa eccezione se il Local Storage è stato manipolato inserendo dati incompatibili.
+     */
+    public List<OutputGroupDto> getLocalGroupList(Set<UUID> participantIds)
+    {
+        if(participantIds == null || participantIds.isEmpty())
+            return new ArrayList<>();
+        List<SpendingGroup> groupsToBeValidated = new ArrayList<>();
+        for(UUID id : participantIds)
+        {
+            Optional<Participant> op = partRepo.findById(id);
+            if(op.isEmpty())
+                throw new RuntimeException("Could not find group related to this participant");
+            if(op.get().getGroupUser() != null)
+                throw new LocalStorageErrorException();
+            SpendingGroup sg = op.get().getSpendingGroup();
+            groupsToBeValidated.add(sg);
+        }
+        Set<SpendingGroup> groupSet = new HashSet<>(groupsToBeValidated);
+        if(groupSet.size() != groupsToBeValidated.size())
+            throw new LocalStorageErrorException();
+        List<OutputGroupDto> validatedGroups = new ArrayList<>();
+        for(SpendingGroup sg : groupSet)
+            validatedGroups.add(convertToLocalGroupPreviewDto(sg));
+        return validatedGroups;
+    }
+
+    public OutputGroupDto getGroupDetail(UUID groupId)
+    {
+        Optional<SpendingGroup> op = sgRepo.findById(groupId);
+        if(op.isEmpty())
+            throw new RuntimeException("Group not found");
+        SpendingGroup sg = op.get();
+        return convertToGroupDetailDto(sg);
+    }
+
+    // METODI DI CONVERSIONE IN DTO PER LA PREVIEW DEI GRUPPI
+
+    /**
+     * Questo metodo converte lo SpendingGroup in DTO prendendo i valori dalle proprietà del Participant indicato
+     * come founder del gruppo, ossia il partecipante che rappresenta l'utente in locale.
      * @param sg Lo SpendingGroup che si vuole convertire in DTO
-     * @return l'OutputGroupDto convertito
+     * @return l'OutputGroupDto convertito per la preview
      */
-    private OutputGroupDto convertToLocalGroupDto(SpendingGroup sg)
+    private OutputGroupDto convertToLocalGroupPreviewDto(SpendingGroup sg)
     {
-        OutputGroupDto dto = convertToDto(sg);
+        OutputGroupDto dto = convertToGroupPreviewDto(sg);
+        dto.setMyParticipantId(sg.getMyParticipant().getId());
         dto.setMyParticipantBalance(sg.getMyParticipant().getBalance());
+        dto.setMyParticipantTotalExpenses(sg.getMyParticipant().getParticipantTotalExpense());
         return dto;
     }
     
     /**
-     * Questo metodo converte lo SpendingGroup in DTO prendendo come valore di myParticipantBalance (variabile di OutputGroupDto)
-     * il balance del Participant che è legato al GroupUser passato come parametro, ossia il partecipante che
-     * rappresente lo User autenticato.
+     * Questo metodo converte lo SpendingGroup in DTO prendendo i valori dalle proprietà del Participant legato
+     * al GroupUser passato come parametro, ossia il partecipante che rappresenta lo User autenticato.
      * @param gUser il GroupUser legato al Participant rappresentante l'utente autenticato
-     * @return l'OutputGroupDto convertito
+     * @return l'OutputGroupDto convertito per la preview
      */
-    private OutputGroupDto convertToUserGroupDto(GroupUser gUser)
+    private OutputGroupDto convertToUserGroupPreviewDto(GroupUser gUser)
     {
-        OutputGroupDto dto = convertToDto(gUser.getSpendingGroup());
+        OutputGroupDto dto = convertToGroupPreviewDto(gUser.getSpendingGroup());
+        dto.setMyParticipantId(gUser.getParticipant().getId());
         dto.setMyParticipantBalance(gUser.getParticipant().getBalance());
-        return dto;
-    }
-    
-    private OutputGroupDto convertToDto(SpendingGroup sg)
-    {
-        OutputGroupDto dto = new OutputGroupDto();
-        dto.setName(sg.getName());
-        dto.setTotalExpenses(sg.getTotalExpenses());
+        dto.setMyParticipantTotalExpenses(gUser.getParticipant().getParticipantTotalExpense());
         return dto;
     }
 
-    //     private SpendingGroup convertDtoToEntity(InputGroupDto dto)
-    //     {
-        //         SpendingGroup sg = new SpendingGroup();
-//         sg.setName(dto.getName());
-//         sg.setParticipants(dto.getPartecipants());
-//     }
+    private OutputGroupDto convertToGroupPreviewDto(SpendingGroup sg)
+    {
+        OutputGroupDto dto = new OutputGroupDto();
+        dto.setGroupId(sg.getId());
+        dto.setGroupName(sg.getName());
+        dto.setGroupTotalExpenses(sg.getTotalExpenses());
+        return dto;
+    }
+
+    // METODI DI CONVERSIONE IN DTO PER IL DETTAGLIO DEL SINGOLO GRUPPO
+
+    private OutputGroupDto convertToGroupDetailDto(SpendingGroup sg)
+    {
+        OutputGroupDto dto = new OutputGroupDto();
+        dto.setParticipants(convertParticipantsToDto(sg));
+        dto.setExpenses(convertExpensesToDto(sg));
+        return dto;
+    }
+
+    private Set<OutputParticipantDto> convertParticipantsToDto(SpendingGroup sg)
+    {
+        Set<OutputParticipantDto> dtos = new HashSet<>();
+        for(Participant p : sg.getParticipants())
+        {
+            OutputParticipantDto dto = new OutputParticipantDto();
+            dto.setParticipantId(p.getId());
+            dto.setParticipantName(p.getName());
+            dto.setBalance(p.getBalance());
+            dto.setParticipantTotalExpense(p.getParticipantTotalExpense());
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+    private Set<OutputExpenseDto> convertExpensesToDto(SpendingGroup sg)
+    {
+        Set<OutputExpenseDto> dtos = new HashSet<>();
+        for(Expense e : sg.getExpenses())
+        {
+            OutputExpenseDto dto = new OutputExpenseDto();
+            dto.setExpenseTitle(e.getTitle());
+            dto.setAmount(e.getAmount());
+            dto.setDate(e.getDate());
+            dto.setExpenseParticipants(convertExpenseParticipantsToDto(e));
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+    private Set<OutputExpenseParticipantDto> convertExpenseParticipantsToDto(Expense e)
+    {
+        Set<OutputExpenseParticipantDto> dtos = new HashSet<>();
+        for(ExpenseParticipant expPart : e.getParticipants())
+        {
+            OutputExpenseParticipantDto dto = new OutputExpenseParticipantDto();
+            dto.setExpenseParticipantName(expPart.getParticipant().getName());
+            dto.setPaidAmount(expPart.getPaidAmount());
+            dto.setShare(expPart.getShare());
+            dtos.add(dto);
+        }
+        return dtos;
+    }
 }

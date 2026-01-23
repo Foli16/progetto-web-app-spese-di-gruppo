@@ -1,4 +1,4 @@
-package com.exercise.progetto_individuale.dtos;
+package com.exercise.progetto_individuale.dtos.input_dtos;
 
 import lombok.Getter;
 import lombok.Setter;

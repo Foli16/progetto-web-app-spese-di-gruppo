@@ -1,4 +1,4 @@
-package com.exercise.progetto_individuale.dtos;
+package com.exercise.progetto_individuale.dtos.input_dtos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,5 +10,5 @@ import lombok.Setter;
 @Setter
 public class InputGroupDto {
     private String name;
-    private List<ParticipantDto> participants = new ArrayList<>();
+    private List<InputParticipantDto> participants = new ArrayList<>();
 }

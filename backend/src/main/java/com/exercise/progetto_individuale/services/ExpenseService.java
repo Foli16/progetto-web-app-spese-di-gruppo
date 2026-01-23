@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.exercise.progetto_individuale.dtos.InputExpenseDto;
+import com.exercise.progetto_individuale.dtos.input_dtos.InputExpenseDto;
 import com.exercise.progetto_individuale.entities.Expense;
 import com.exercise.progetto_individuale.entities.ExpenseParticipant;
 import com.exercise.progetto_individuale.entities.Participant;
@@ -50,22 +50,24 @@ public class ExpenseService
             if(pOp.isEmpty())
                 throw new RuntimeException("Participant with id '" + partId + "' not existent or not present in group");
             Participant p = pOp.get();
-            createExpenseParticipant(p, exp, dto);
+            exp = createExpenseParticipant(p, exp, dto);
         }
+        sg.addExpense(exp);
         sg.addExpenseToTotal(exp.getAmount());
         sgRepo.save(sg);
     }
 
-    private void createExpenseParticipant(Participant p, Expense exp, InputExpenseDto dto)
+    private Expense createExpenseParticipant(Participant p, Expense exp, InputExpenseDto dto)
     {
         ExpenseParticipant expPart = new ExpenseParticipant();
         expPart.setPaidAmount(dto.getExpenseParticipants().get(p.getId()).getPaidAmount());
         expPart.setShare(dto.getExpenseParticipants().get(p.getId()).getShare());
         expPart = expParRepo.save(expPart);
         exp.addParticipant(expPart);
+        exp = expRepo.save(exp);
         p.addExpense(expPart);
         p.setBalance(expPart.getPaidAmount() - expPart.getShare());
-        expRepo.save(exp);
         partRepo.save(p);
+        return exp;
     }
 }

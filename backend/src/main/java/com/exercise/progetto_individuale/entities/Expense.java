@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.exercise.progetto_individuale.dtos.InputExpenseParticipantDto;
+import com.exercise.progetto_individuale.dtos.input_dtos.InputExpenseParticipantDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +34,9 @@ public class Expense extends BaseEntity
 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ExpenseParticipant> participants = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private SpendingGroup spendingGroup;
 
     public void addParticipant(ExpenseParticipant expPart)
     {

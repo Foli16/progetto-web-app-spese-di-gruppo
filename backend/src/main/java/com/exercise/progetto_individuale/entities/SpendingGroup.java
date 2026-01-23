@@ -28,6 +28,9 @@ public class SpendingGroup extends BaseEntity
 
     @OneToMany(mappedBy = "spendingGroup", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Participant> participants = new HashSet<>();
+
+    @OneToMany(mappedBy = "spendingGroup", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Expense> expenses = new HashSet<>();
     
     public SpendingGroup(String name)
     {
@@ -44,6 +47,12 @@ public class SpendingGroup extends BaseEntity
     {
         this.users.add(gUser);
         gUser.setSpendingGroup(this);
+    }
+
+    public void addExpense(Expense expense)
+    {
+        this.expenses.add(expense);
+        expense.setSpendingGroup(this);
     }
 
     public void addExpenseToTotal(double expense)

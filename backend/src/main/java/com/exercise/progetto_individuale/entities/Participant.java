@@ -50,4 +50,9 @@ public class Participant extends BaseEntity
     {
         this.balance += amountToAdd;
     }
+
+    public double getParticipantTotalExpense()
+    {
+        return this.expenses.stream().mapToDouble(e -> e.getShare()).sum();
+    }
 }

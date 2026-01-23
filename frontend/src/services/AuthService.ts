@@ -28,7 +28,11 @@ export class AuthService {
     let body = {username, password};
 
     this.http.post("api/auth/register", body).subscribe({
-      next: () => this.router.navigate([""]),
+      next: () => 
+        {
+          this.getUserInfo();
+          this.router.navigate([""]);
+        },
       error: () => alert("password non valida")
     });
   }

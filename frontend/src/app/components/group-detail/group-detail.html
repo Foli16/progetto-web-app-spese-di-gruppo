@@ -1,0 +1,12 @@
+<h3>{{basicInfo?.groupName}}</h3>
+
+@for(e of group!.expenses; track $index)
+{
+    <div class="card mx-auto" style="width: 300px;">
+  <a style="cursor: pointer;">
+    <div class="card-body">
+      {{e.expenseTitle}} {{e.amount}} {{e.date}}
+    </div>
+  </a>
+</div>
+}

@@ -2,7 +2,7 @@
 <div class="container-fluid mt-5">
 @for (group of serv.groups; track $index) {
 <div class="card mx-auto" style="width: 300px;">
-  <a style="cursor: pointer;">
+  <a style="cursor: pointer;" (click)="openGroup(group)">
     <div class="card-body">
       {{group.groupName}} {{group.groupTotalExpenses}} {{group.myParticipantBalance}}
     </div>

@@ -1,4 +1,4 @@
-export interface SpendingGroupGet
+export interface GroupPreviewGet
 {
     groupId:string,
     groupName:string,

@@ -1,0 +1,25 @@
+export interface GroupDetailGet
+{
+    participants:[
+        {
+            participantId:string,
+            participantName:string,
+            participantTotalExpense:number,
+            balance:number
+        }
+    ],
+    expenses:[
+        {
+            expenseTitle:string,
+            amount:number,
+            date:Date,
+            expenseParticipants:[
+                {
+                    expenseParticipantName:string,
+                    paidAmount:number,
+                    share:number
+                }
+            ]
+        }
+    ]
+}

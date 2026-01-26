@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { GroupService } from '../../../services/GroupService';
 import { GroupPreviewGet } from '../../../model/GroupPreviewGet';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-group-list',
@@ -9,7 +10,7 @@ import { GroupPreviewGet } from '../../../model/GroupPreviewGet';
   styleUrl: './group-list.css',
 })
 export class GroupList {
-    constructor(public serv:GroupService)
+    constructor(public serv:GroupService, private router:Router)
     {
       this.fillArray();
     }
@@ -19,8 +20,8 @@ export class GroupList {
       this.serv.getGroupList();
     }
 
-    openGroup(group:GroupPreviewGet)
+    openGroup(groupId:string, myParticipantId:string)
     {
-      this.serv.getGroupDetail(group);
+      this.router.navigate(["/group-detail", groupId, myParticipantId]);
     }
  }

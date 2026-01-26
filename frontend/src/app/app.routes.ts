@@ -11,5 +11,5 @@ export const routes: Routes = [
     {path:"form",component:GroupForm},
     {path:"registration",component:RegistrationForm,canActivate:[authFormGuard]},
     {path:"login",component:LoginForm,canActivate:[authFormGuard]},
-    {path:"group-detail",component:GroupDetail}
+    {path:"group-detail/:id/:partId",component:GroupDetail}
 ];

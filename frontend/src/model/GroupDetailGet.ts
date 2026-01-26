@@ -1,25 +1,26 @@
+import { GroupPreviewGet } from "./GroupPreviewGet"
+
 export interface GroupDetailGet
 {
-    participants:[
+    basicInfo:GroupPreviewGet,
+    participants:
+    {
+        participantId:string,
+        participantName:string,
+        participantTotalExpense:number,
+        balance:number
+    }[],
+    expenses:
+    {
+        expenseTitle:string,
+        amount:number,
+        date:string,
+        creationTime:Date,
+        expenseParticipants:
         {
-            participantId:string,
-            participantName:string,
-            participantTotalExpense:number,
-            balance:number
-        }
-    ],
-    expenses:[
-        {
-            expenseTitle:string,
-            amount:number,
-            date:Date,
-            expenseParticipants:[
-                {
-                    expenseParticipantName:string,
-                    paidAmount:number,
-                    share:number
-                }
-            ]
-        }
-    ]
+            expenseParticipantName:string,
+            paidAmount:number,
+            share:number
+        }[]
+    }[]
 }

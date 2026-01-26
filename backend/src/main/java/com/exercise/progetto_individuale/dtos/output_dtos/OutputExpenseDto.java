@@ -1,6 +1,7 @@
 package com.exercise.progetto_individuale.dtos.output_dtos;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,5 +18,6 @@ public class OutputExpenseDto {
     private String expenseTitle;
     private double amount;
     private LocalDate date;
+    private LocalDateTime creationTime;
     private Set<OutputExpenseParticipantDto> expenseParticipants = new HashSet<>();
 }

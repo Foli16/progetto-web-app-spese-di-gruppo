@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { GroupService } from '../../../services/GroupService';
 import { GroupPreviewGet } from '../../../model/GroupPreviewGet';
 import { GroupDetailGet } from '../../../model/GroupDetailGet';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-group-detail',
@@ -11,17 +12,18 @@ import { GroupDetailGet } from '../../../model/GroupDetailGet';
 })
 export class GroupDetail {
   
-  group:GroupDetailGet | null = null;
-  basicInfo:GroupPreviewGet | null = null;
+  // group:GroupDetailGet | null = null;
+  // basicInfo:GroupPreviewGet | null = null;
   
-  constructor(public serv:GroupService)
+  constructor(public serv:GroupService, private route:ActivatedRoute)
   {
-    this.fillGroup();
+    this.getGroupDetail();
   }
   
-  fillGroup()
+  getGroupDetail()
   {
-    this.group = this.serv.openedGroup;
-    this.basicInfo = this.serv.openedGroupBasicInfo;
+    const id = this.route.snapshot.paramMap.get("id");
+    const partId = this.route.snapshot.paramMap.get("partId");
+    this.serv.getGroupDetail(id, partId);
   }
  }

@@ -1,6 +1,7 @@
 package com.exercise.progetto_individuale.entities;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +14,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -31,6 +33,8 @@ public class Expense extends BaseEntity
     private double amount;
     @NotNull @PastOrPresent
     private LocalDate date;
+    @NotNull @PastOrPresent
+    private LocalDateTime creationTime;
 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ExpenseParticipant> participants = new HashSet<>();
@@ -56,5 +60,11 @@ public class Expense extends BaseEntity
         if(totalShare != totalPaid)
             throw new RuntimeException("Total share amount must be equal to total paid amount");
         this.amount = totalShare;
+    }
+
+    @PrePersist
+    public void onCreation()
+    {
+        this.creationTime = LocalDateTime.now();
     }
 }

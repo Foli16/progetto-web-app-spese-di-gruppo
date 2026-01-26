@@ -13,7 +13,6 @@ export class GroupService {
 
   groups:GroupPreviewGet[] = [];
   openedGroup:GroupDetailGet | null = null;
-  openedGroupBasicInfo:GroupPreviewGet | null = null;
 
   constructor(private http:HttpClient, private localServ:LocalParticipantService, private router:Router) { }
 
@@ -29,16 +28,39 @@ export class GroupService {
     });
   }
 
-  getGroupDetail(group:GroupPreviewGet)
+  getGroupDetail(groupId:string | null, myPartId:string | null)
   {
-    this.openedGroupBasicInfo = group;
-    return this.http.get<GroupDetailGet>("api/groups/"+group.groupId).subscribe({
+    return this.http.get<GroupDetailGet>("api/groups/"+groupId).subscribe({
       next: (resp) =>
       {
         this.openedGroup = resp;
-        this.router.navigate(["/group-detail"])
+        this.openedGroup.expenses = this.openedGroup.expenses.map(e => (
+          {
+          ...e,
+          creationTime: new Date(e.creationTime)
+          }
+        ));
+        this.getOpenedGroupBasicInfo(myPartId);
+        this.openedGroup.expenses.sort((a,b) => 
+          {
+            const dateComparation = b.date.localeCompare(a.date);
+            return dateComparation == 0 ? b.creationTime.getTime() - a.creationTime.getTime() : dateComparation;
+          }
+        );
       },
       error: () => alert("errore fatale")
+    });
+  }
+
+  private getOpenedGroupBasicInfo(myPartId:string | null)
+  {
+    let singleIdArray = [myPartId];
+    return this.http.post<GroupPreviewGet[]>("api/groups/list", singleIdArray).subscribe({
+      next: (resp) => 
+        {
+          this.openedGroup!.basicInfo = resp[0];
+        },
+      error: (error) => alert(error)
     });
   }
 

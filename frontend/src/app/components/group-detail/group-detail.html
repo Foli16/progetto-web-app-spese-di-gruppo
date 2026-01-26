@@ -1,6 +1,6 @@
-<h3>{{basicInfo?.groupName}}</h3>
+<h3>{{serv.openedGroup?.basicInfo?.groupName}}</h3>
 
-@for(e of group!.expenses; track $index)
+@for(e of serv.openedGroup?.expenses; track $index)
 {
     <div class="card mx-auto" style="width: 300px;">
   <a style="cursor: pointer;">

@@ -185,7 +185,7 @@ public class GroupService
         return validatedGroups;
     }
 
-    public OutputGroupDto getGroupDetail(UUID groupId, UUID myParticipantId)
+    public OutputGroupDto getGroupDetail(UUID groupId, UUID myParticipantId, String token)
     {
         Optional<SpendingGroup> gOp = sgRepo.findById(groupId);
         if(gOp.isEmpty())
@@ -193,6 +193,16 @@ public class GroupService
         Optional<Participant> pOp = partRepo.findParticipantByIdAndSpendingGroup(myParticipantId, gOp.get());
         if(pOp.isEmpty())
             throw new RuntimeException("Participant not existent or not present in group");
+        if(token != null)
+        {
+            User u = uServ.findUserByToken(token);
+            Optional<GroupUser> op = gUserRepo.findByUserAndParticipantId(u, myParticipantId);
+            if(op.isEmpty())
+                throw new RuntimeException("Cannot access the group with this participant ID");
+        }
+        else
+            if(!gOp.get().getMyParticipant().equals(pOp.get()) || pOp.get().getGroupUser() != null)
+                throw new RuntimeException("Cannot access the group with this participant ID");
         return convertToGroupDetailDto(gOp.get(), pOp.get());
     }
 

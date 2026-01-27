@@ -63,9 +63,9 @@ public class GroupController
 
     @GetMapping("{groupId}/{myParticipantId}")
     @JsonView(Views.Detail.class)
-    public OutputGroupDto getGroupDetail(@PathVariable UUID groupId, @PathVariable UUID myParticipantId)
+    public OutputGroupDto getGroupDetail(@PathVariable UUID groupId, @PathVariable UUID myParticipantId, @CookieValue(required = false) String token)
     {
-        return gServ.getGroupDetail(groupId, myParticipantId);
+        return gServ.getGroupDetail(groupId, myParticipantId, token);
     }
 
     // @GetMapping("list")

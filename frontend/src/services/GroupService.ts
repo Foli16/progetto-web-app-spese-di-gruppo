@@ -34,19 +34,7 @@ export class GroupService {
       next: (resp) =>
       {
         this.openedGroup = resp;
-        this.openedGroup.expenses = this.openedGroup.expenses.map(e => (
-          {
-          ...e,
-          creationTime: new Date(e.creationTime)
-          }
-        ));
         this.getOpenedGroupBasicInfo(myPartId);
-        this.openedGroup.expenses.sort((a,b) => 
-          {
-            const dateComparation = b.date.localeCompare(a.date);
-            return dateComparation == 0 ? b.creationTime.getTime() - a.creationTime.getTime() : dateComparation;
-          }
-        );
       },
       error: () => alert("errore fatale")
     });

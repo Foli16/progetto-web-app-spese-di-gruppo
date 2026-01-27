@@ -3,11 +3,11 @@ package com.exercise.progetto_individuale.services;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -273,7 +273,10 @@ public class GroupService
             dto.setExpenseParticipants(convertExpenseParticipantsToDto(e));
             dtos.add(dto);
         }
-        return dtos;//.stream().sorted(Comparator.comparing(OutputExpenseDto::getCreationTime)).collect(Collectors.toSet());
+        return dtos.stream().sorted(
+            Comparator.comparing(OutputExpenseDto::getDate, Comparator.reverseOrder())
+            .thenComparing(OutputExpenseDto::getCreationTime, Comparator.reverseOrder()))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private Set<OutputExpenseParticipantDto> convertExpenseParticipantsToDto(Expense e)

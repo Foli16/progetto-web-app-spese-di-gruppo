@@ -185,13 +185,15 @@ public class GroupService
         return validatedGroups;
     }
 
-    public OutputGroupDto getGroupDetail(UUID groupId)
+    public OutputGroupDto getGroupDetail(UUID groupId, UUID myParticipantId)
     {
-        Optional<SpendingGroup> op = sgRepo.findById(groupId);
-        if(op.isEmpty())
+        Optional<SpendingGroup> gOp = sgRepo.findById(groupId);
+        if(gOp.isEmpty())
             throw new RuntimeException("Group not found");
-        SpendingGroup sg = op.get();
-        return convertToGroupDetailDto(sg);
+        Optional<Participant> pOp = partRepo.findParticipantByIdAndSpendingGroup(myParticipantId, gOp.get());
+        if(pOp.isEmpty())
+            throw new RuntimeException("Participant not existent or not present in group");
+        return convertToGroupDetailDto(gOp.get(), pOp.get());
     }
 
     // METODI DI CONVERSIONE IN DTO PER LA PREVIEW DEI GRUPPI
@@ -204,10 +206,7 @@ public class GroupService
      */
     private OutputGroupDto convertToLocalGroupPreviewDto(SpendingGroup sg)
     {
-        OutputGroupDto dto = convertToGroupPreviewDto(sg);
-        dto.setMyParticipantId(sg.getMyParticipant().getId());
-        dto.setMyParticipantBalance(sg.getMyParticipant().getBalance());
-        dto.setMyParticipantTotalExpenses(sg.getMyParticipant().getParticipantTotalExpense());
+        OutputGroupDto dto = convertToGroupPreviewDto(sg, sg.getMyParticipant());
         return dto;
     }
     
@@ -219,27 +218,27 @@ public class GroupService
      */
     private OutputGroupDto convertToUserGroupPreviewDto(GroupUser gUser)
     {
-        OutputGroupDto dto = convertToGroupPreviewDto(gUser.getSpendingGroup());
-        dto.setMyParticipantId(gUser.getParticipant().getId());
-        dto.setMyParticipantBalance(gUser.getParticipant().getBalance());
-        dto.setMyParticipantTotalExpenses(gUser.getParticipant().getParticipantTotalExpense());
+        OutputGroupDto dto = convertToGroupPreviewDto(gUser.getSpendingGroup(), gUser.getParticipant());
         return dto;
     }
 
-    private OutputGroupDto convertToGroupPreviewDto(SpendingGroup sg)
+    private OutputGroupDto convertToGroupPreviewDto(SpendingGroup sg, Participant p)
     {
         OutputGroupDto dto = new OutputGroupDto();
         dto.setGroupId(sg.getId());
         dto.setGroupName(sg.getName());
         dto.setGroupTotalExpenses(sg.getTotalExpenses());
+        dto.setMyParticipantId(p.getId());
+        dto.setMyParticipantBalance(p.getBalance());
+        dto.setMyParticipantTotalExpenses(p.getParticipantTotalExpense());
         return dto;
     }
 
     // METODI DI CONVERSIONE IN DTO PER IL DETTAGLIO DEL SINGOLO GRUPPO
 
-    private OutputGroupDto convertToGroupDetailDto(SpendingGroup sg)
+    private OutputGroupDto convertToGroupDetailDto(SpendingGroup sg, Participant p)
     {
-        OutputGroupDto dto = new OutputGroupDto();
+        OutputGroupDto dto = convertToGroupPreviewDto(sg, p);
         dto.setParticipants(convertParticipantsToDto(sg));
         dto.setExpenses(convertExpensesToDto(sg));
         return dto;

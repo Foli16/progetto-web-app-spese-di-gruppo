@@ -61,11 +61,11 @@ public class GroupController
             return gServ.getLocalGroupList(participantIds);
     }
 
-    @GetMapping("{groupId}")
+    @GetMapping("{groupId}/{myParticipantId}")
     @JsonView(Views.Detail.class)
-    public OutputGroupDto getGroupDetail(@PathVariable UUID groupId)
+    public OutputGroupDto getGroupDetail(@PathVariable UUID groupId, @PathVariable UUID myParticipantId)
     {
-        return gServ.getGroupDetail(groupId);
+        return gServ.getGroupDetail(groupId, myParticipantId);
     }
 
     // @GetMapping("list")

@@ -1,8 +1,7 @@
 import { GroupPreviewGet } from "./GroupPreviewGet"
 
-export interface GroupDetailGet
+export type GroupDetailGet = GroupPreviewGet &
 {
-    basicInfo:GroupPreviewGet,
     participants:
     {
         participantId:string,

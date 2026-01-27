@@ -30,25 +30,20 @@ export class GroupService {
 
   getGroupDetail(groupId:string | null, myPartId:string | null)
   {
-    return this.http.get<GroupDetailGet>("api/groups/"+groupId).subscribe({
+    if(!groupId || !myPartId)
+    {
+      return;
+    }
+    return this.http.get<GroupDetailGet>("api/groups/"+groupId+"/"+myPartId).subscribe({
       next: (resp) =>
       {
         this.openedGroup = resp;
-        this.getOpenedGroupBasicInfo(myPartId);
       },
-      error: () => alert("errore fatale")
-    });
-  }
-
-  private getOpenedGroupBasicInfo(myPartId:string | null)
-  {
-    let singleIdArray = [myPartId];
-    return this.http.post<GroupPreviewGet[]>("api/groups/list", singleIdArray).subscribe({
-      next: (resp) => 
-        {
-          this.openedGroup!.basicInfo = resp[0];
-        },
-      error: (error) => alert(error)
+      error: () =>
+      {
+        alert("errore fatale");
+        this.router.navigate(["/"]);
+      }
     });
   }
 

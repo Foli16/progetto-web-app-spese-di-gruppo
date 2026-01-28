@@ -145,8 +145,8 @@ public class GroupService
         User u = uServ.findUserByToken(token);
         List<OutputGroupDto> groups = new ArrayList<>();
         for(GroupUser gUser : u.getGroups())
-            groups.add(convertToUserGroupPreviewDto(gUser));
-        return groups;
+            groups.add(convertToGroupPreviewDto(gUser.getSpendingGroup(), gUser.getParticipant()));
+        return sortByLastModified(groups);
     }
 
     /**
@@ -182,8 +182,15 @@ public class GroupService
             throw new LocalStorageErrorException();
         List<OutputGroupDto> validatedGroups = new ArrayList<>();
         for(SpendingGroup sg : groupSet)
-            validatedGroups.add(convertToLocalGroupPreviewDto(sg));
-        return validatedGroups;
+            validatedGroups.add(convertToGroupPreviewDto(sg, sg.getMyParticipant()));
+        return sortByLastModified(validatedGroups);
+    }
+
+    private List<OutputGroupDto> sortByLastModified(List<OutputGroupDto> dtos)
+    {
+        return dtos.stream().sorted(
+            Comparator.comparing(OutputGroupDto::getLastModified, Comparator.reverseOrder()))
+            .toList();
     }
 
     public OutputGroupDto getGroupDetail(UUID groupId, UUID myParticipantId, String token)
@@ -209,36 +216,13 @@ public class GroupService
 
     // METODI DI CONVERSIONE IN DTO PER LA PREVIEW DEI GRUPPI
 
-    /**
-     * Questo metodo converte lo SpendingGroup in DTO prendendo i valori dalle proprietà del Participant indicato
-     * come founder del gruppo, ossia il partecipante che rappresenta l'utente in locale.
-     * @param sg Lo SpendingGroup che si vuole convertire in DTO
-     * @return l'OutputGroupDto convertito per la preview
-     */
-    private OutputGroupDto convertToLocalGroupPreviewDto(SpendingGroup sg)
-    {
-        OutputGroupDto dto = convertToGroupPreviewDto(sg, sg.getMyParticipant());
-        return dto;
-    }
-    
-    /**
-     * Questo metodo converte lo SpendingGroup in DTO prendendo i valori dalle proprietà del Participant legato
-     * al GroupUser passato come parametro, ossia il partecipante che rappresenta lo User autenticato.
-     * @param gUser il GroupUser legato al Participant rappresentante l'utente autenticato
-     * @return l'OutputGroupDto convertito per la preview
-     */
-    private OutputGroupDto convertToUserGroupPreviewDto(GroupUser gUser)
-    {
-        OutputGroupDto dto = convertToGroupPreviewDto(gUser.getSpendingGroup(), gUser.getParticipant());
-        return dto;
-    }
-
     private OutputGroupDto convertToGroupPreviewDto(SpendingGroup sg, Participant p)
     {
         OutputGroupDto dto = new OutputGroupDto();
         dto.setGroupId(sg.getId());
         dto.setGroupName(sg.getName());
         dto.setGroupTotalExpenses(sg.getTotalExpenses());
+        dto.setLastModified(sg.getLastModified());
         dto.setMyParticipantId(p.getId());
         dto.setMyParticipantBalance(p.getBalance());
         dto.setMyParticipantTotalExpenses(p.getParticipantTotalExpense());

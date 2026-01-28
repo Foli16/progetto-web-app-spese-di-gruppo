@@ -1,5 +1,6 @@
 package com.exercise.progetto_individuale.dtos.output_dtos;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -25,6 +26,8 @@ public class OutputGroupDto {
     private double myParticipantBalance;
     @JsonView(Views.Preview.class)
     private double myParticipantTotalExpenses;
+    
+    private LocalDateTime lastModified;
 
     @JsonView(Views.Detail.class)
     private Set<OutputParticipantDto> participants = new HashSet<>();

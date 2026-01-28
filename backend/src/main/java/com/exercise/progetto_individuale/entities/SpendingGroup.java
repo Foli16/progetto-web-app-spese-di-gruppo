@@ -1,5 +1,6 @@
 package com.exercise.progetto_individuale.entities;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +24,8 @@ public class SpendingGroup extends BaseEntity
     @NotBlank @NotNull
     private String name;
     private double totalExpenses;
+    @PastOrPresent
+    private LocalDateTime lastModified;
 
     @OneToMany(mappedBy = "spendingGroup", cascade = CascadeType.ALL)
     private Set<GroupUser> users = new HashSet<>();
@@ -35,6 +39,7 @@ public class SpendingGroup extends BaseEntity
     public SpendingGroup(String name)
     {
         this.name = name;
+        this.lastModified = LocalDateTime.now();
     }
 
     public void addParticipant(Participant p)

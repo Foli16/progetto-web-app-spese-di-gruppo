@@ -22,7 +22,6 @@ export class GroupService {
       next: (resp) => 
         {
           this.groups = resp;
-          this.groups.sort((a,b) => a.groupName.localeCompare(b.groupName));
           this.openedGroup = null;
         },
       error: (error) => alert(error)

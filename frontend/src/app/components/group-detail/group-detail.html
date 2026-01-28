@@ -1,4 +1,9 @@
-<h3>{{serv.openedGroup?.groupName}}</h3>
+<h3 style="text-align: center; margin-bottom: 30px; margin-top: 30px;">{{serv.openedGroup?.groupName}}</h3>
+<div style="text-align: center; margin-bottom: 30px;">
+  <span>Spese totali: {{serv.openedGroup?.groupTotalExpenses}} €</span>
+  -
+  <span>Spese personali: {{serv.openedGroup?.myParticipantTotalExpenses}} €</span>
+</div>
 
 @for(e of serv.openedGroup?.expenses; track $index)
 {
@@ -10,3 +15,7 @@
   </a>
 </div>
 }
+<br/>
+<div style="text-align: center;">
+  <button (click)="router.navigate(['/'])">TORNA A LISTA</button>
+</div>

@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   styleUrl: './group-list.css',
 })
 export class GroupList {
-    constructor(public serv:GroupService, private router:Router)
+    constructor(public serv:GroupService, public router:Router)
     {
       this.fillArray();
     }

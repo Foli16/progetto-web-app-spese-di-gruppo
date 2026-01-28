@@ -25,6 +25,7 @@ import com.exercise.progetto_individuale.entities.GroupUser;
 import com.exercise.progetto_individuale.entities.Participant;
 import com.exercise.progetto_individuale.entities.SpendingGroup;
 import com.exercise.progetto_individuale.entities.User;
+import com.exercise.progetto_individuale.exceptions.GroupAccessDeniedException;
 import com.exercise.progetto_individuale.exceptions.LocalStorageErrorException;
 import com.exercise.progetto_individuale.exceptions.UniqueNameCostraintException;
 import com.exercise.progetto_individuale.repositories.GroupUserRepository;
@@ -198,11 +199,11 @@ public class GroupService
             User u = uServ.findUserByToken(token);
             Optional<GroupUser> op = gUserRepo.findByUserAndParticipantId(u, myParticipantId);
             if(op.isEmpty())
-                throw new RuntimeException("Cannot access the group with this participant ID");
+                throw new GroupAccessDeniedException();
         }
         else
             if(!gOp.get().getMyParticipant().equals(pOp.get()) || pOp.get().getGroupUser() != null)
-                throw new RuntimeException("Cannot access the group with this participant ID");
+                throw new GroupAccessDeniedException();
         return convertToGroupDetailDto(gOp.get(), pOp.get());
     }
 

@@ -58,9 +58,11 @@ public class SpendingGroup extends BaseEntity
     {
         this.expenses.add(expense);
         expense.setSpendingGroup(this);
+        addExpenseToTotal(expense.getAmount());
+        this.lastModified = LocalDateTime.now();
     }
 
-    public void addExpenseToTotal(double expense)
+    private void addExpenseToTotal(double expense)
     {
         this.totalExpenses += expense;
     }

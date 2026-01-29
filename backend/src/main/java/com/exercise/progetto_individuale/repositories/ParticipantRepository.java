@@ -1,5 +1,6 @@
 package com.exercise.progetto_individuale.repositories;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,5 +14,5 @@ public interface ParticipantRepository extends JpaRepository<Participant, UUID>
 {
     Optional<Participant> findParticipantByIdAndSpendingGroup(UUID id, SpendingGroup sg);
 
-    List<Participant> findAllByIdInAndSpendingGroup(Iterable<UUID> ids, SpendingGroup sg);
+    List<Participant> findAllByIdInAndSpendingGroup(Collection<UUID> ids, SpendingGroup sg);
 }

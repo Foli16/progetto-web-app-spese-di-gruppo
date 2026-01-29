@@ -1,6 +1,5 @@
 package com.exercise.progetto_individuale.services;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,16 +41,16 @@ public class ExpenseService
 
     private void convertToExpenseAndSave(InputExpenseDto dto, SpendingGroup sg)
     {
-        List<Participant> validatedParticipants = partRepo.findAllByIdInAndSpendingGroup(dto.getExpenseParticipants().keySet(), sg); //non va bene, deve dare eccezione se non ne trova uno
+        List<Participant> participants = partRepo.findAllByIdInAndSpendingGroup(dto.getExpenseParticipants().keySet(), sg);
+        if(participants.size() != dto.getExpenseParticipants().keySet().size())
+            throw new RuntimeException("One or more participants not found or do not belong to this group");
         Expense exp = new Expense();
         exp.setTitle(dto.getTitle());
         exp.setDate(dto.getDate());
         exp.setAmount(dto.getExpenseParticipants());
-        for(Participant p : validatedParticipants)
+        for(Participant p : participants)
             exp = createExpenseParticipant(p, exp, dto);
         sg.addExpense(exp);
-        sg.addExpenseToTotal(exp.getAmount());
-        sg.setLastModified(LocalDateTime.now());
         sgRepo.save(sg);
     }
 

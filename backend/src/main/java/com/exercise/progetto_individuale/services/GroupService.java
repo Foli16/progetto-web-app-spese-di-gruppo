@@ -143,6 +143,8 @@ public class GroupService
         if(token == null || token.isBlank())
             return new ArrayList<>();
         User u = uServ.findUserByToken(token);
+        if(u.getGroups().isEmpty())
+            return new ArrayList<>();
         List<OutputGroupDto> groups = new ArrayList<>();
         for(GroupUser gUser : u.getGroups())
             groups.add(convertToGroupPreviewDto(gUser.getSpendingGroup(), gUser.getParticipant()));

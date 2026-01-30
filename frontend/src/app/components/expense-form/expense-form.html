@@ -5,7 +5,10 @@ DATA: <input type="date" [(ngModel)]="expensePost.date"/>
 <br/>
 PARTECIPANTI ALLA SPESA:<br/>
 @for (row of expenseRows; track $index) {
-        <select [(ngModel)]="row.participantId">
+        <select
+            [(ngModel)]="row.participantId"
+            (ngModelChange)="onParticipantChange(row)"
+        >
             <option hidden [ngValue]="null">SELEZIONA PARTECIPANTE</option>
             @for (p of gServ.openedGroup?.participants; track p.participantId) {
                 <option [ngValue]="p.participantId">{{p.participantName}}</option>

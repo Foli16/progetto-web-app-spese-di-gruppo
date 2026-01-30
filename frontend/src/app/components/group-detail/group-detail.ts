@@ -3,6 +3,7 @@ import { GroupService } from '../../../services/GroupService';
 import { GroupPreviewGet } from '../../../model/GroupPreviewGet';
 import { GroupDetailGet } from '../../../model/GroupDetailGet';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-group-detail',
@@ -24,6 +25,21 @@ export class GroupDetail {
   {
     const id = this.route.snapshot.paramMap.get("id");
     const partId = this.route.snapshot.paramMap.get("partId");
-    this.serv.getGroupDetail(id, partId);
+    return this.serv.getGroupDetail(id, partId).subscribe({
+      next: (resp) =>
+      {
+        this.serv.openedGroup = resp;
+      },
+      error: () =>
+      {
+        alert("errore fatale");
+        this.router.navigate(["/"]);
+      }
+    });
+  }
+
+  openExpenseForm(groupId:string, partId:string)
+  {
+    this.router.navigate(["/group-detail/"+groupId+"/"+partId+"/new-expense"]);
   }
  }

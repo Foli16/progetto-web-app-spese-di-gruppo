@@ -5,6 +5,7 @@ import { LocalParticipantService } from './LocalParticipantService';
 import { SpendingGroupPost } from '../model/SpendingGroupPost';
 import { Router } from '@angular/router';
 import { GroupDetailGet } from '../model/GroupDetailGet';
+import { EMPTY, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -28,23 +29,13 @@ export class GroupService {
     });
   }
 
-  getGroupDetail(groupId:string | null, myPartId:string | null)
+  getGroupDetail(groupId:string | null, myPartId:string | null):Observable<GroupDetailGet>
   {
     if(!groupId || !myPartId)
     {
-      return;
+      return EMPTY;
     }
-    return this.http.get<GroupDetailGet>("api/groups/"+groupId+"/"+myPartId).subscribe({
-      next: (resp) =>
-      {
-        this.openedGroup = resp;
-      },
-      error: () =>
-      {
-        alert("errore fatale");
-        this.router.navigate(["/"]);
-      }
-    });
+    return this.http.get<GroupDetailGet>("api/groups/"+groupId+"/"+myPartId);
   }
 
   createGroup(group:SpendingGroupPost)

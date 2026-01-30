@@ -18,6 +18,10 @@
 }
 <br/>
 <div style="text-align: center;">
+  <button (click)="openExpenseForm(serv.openedGroup.groupId, serv.openedGroup.myParticipantId)">AGGIUNGI SPESA</button>
+</div>
+<br/>
+<div style="text-align: center;">
   <button (click)="router.navigate(['/'])">TORNA A LISTA</button>
 </div>
 }

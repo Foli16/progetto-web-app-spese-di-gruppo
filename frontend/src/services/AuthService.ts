@@ -68,7 +68,7 @@ export class AuthService {
   logout()
   {
     this.userSubject.next(null);
-    this.serv.getGroupList();
     document.cookie = 'token=; Path=/api; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    this.router.navigate(["/"]);
   }
 }

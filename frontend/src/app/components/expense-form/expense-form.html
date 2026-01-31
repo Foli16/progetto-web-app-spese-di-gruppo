@@ -5,7 +5,7 @@ DATA: <input type="date" [(ngModel)]="expensePost.date"/>
 <br/>
 PARTECIPANTI ALLA SPESA:<br/>
 @for (row of expenseRows; track $index) {
-        <select [(ngModel)]="row.participantId">
+        <select [(ngModel)]="row.participantId" (ngModelChange)="onSelectChange(row.participantId, $index)">
             <option hidden [ngValue]="null">SELEZIONA PARTECIPANTE</option>
             @for (p of gServ.openedGroup?.participants; track p.participantId) {
                 <option [ngValue]="p.participantId">{{p.participantName}}</option>
@@ -22,6 +22,10 @@ PARTECIPANTI ALLA SPESA:<br/>
     placeholder="Pagato"
     [(ngModel)]="row.tempPaid"
     />
+    @if($index !== 0)
+    {
+        <button (click)="removeExpenseParticipant($index)">X</button>
+    }
     <br/>
 }
 <button (click)="addExpenseParticipant()" [disabled]="!maxParticipantCheck()">AGGIUNGI PARTECIPANTE</button>

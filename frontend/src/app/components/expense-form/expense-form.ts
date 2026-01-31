@@ -74,17 +74,27 @@ export class ExpenseForm {
     return this.expenseRows.length < this.gServ.openedGroup!.participants.length;
   }
 
-  // onSelectChange(partId:string | null)
-  // {
-  //   if(!partId)
-  //     return;
-  //   for(const row of this.expenseRows)
-  //     if(partId === row.participantId)
+  onSelectChange(partId:string | null, index:number)
+  {
+    if(!partId)
+      return;
+    for(let i = 0; i < this.expenseRows.length; i++)
+    {
+      if(this.expenseRows[i].participantId === partId && i != index)
+        this.expenseRows[i].participantId = null;
+    }
 
-  // }
+  }
+
+  removeExpenseParticipant(index:number)
+  {
+    if(index !== 0)
+      this.expenseRows.splice(index, 1);
+  }
 
   fillCheck()
   {
-    return this.expensePost.title && this.expensePost.title.trim().length > 0 && this.expensePost.date && this.expenseRows.every(r => r.participantId && r.tempPaid && r.tempShare && r.tempPaid > 0 && r.tempShare > 0);
+    return this.expensePost.title && this.expensePost.title.trim().length > 0 && this.expensePost.date &&
+    this.expenseRows.every(r => r.participantId && r.tempPaid && r.tempShare && r.tempPaid > 0 && r.tempShare > 0);
   }
  }

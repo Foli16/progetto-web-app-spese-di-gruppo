@@ -3,7 +3,7 @@ import { ExpensePost } from '../../../model/ExpensePost';
 import { ExpenseService } from '../../../services/ExpenseService';
 import { FormsModule } from '@angular/forms';
 import { GroupService } from '../../../services/GroupService';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 type ExpenseRow = {
   participantId: string | null;
@@ -19,43 +19,54 @@ type ExpenseRow = {
 export class ExpenseForm {
   expensePost:ExpensePost = {title:"", date:"", expenseParticipants:{}};
   expenseRows: ExpenseRow[] = [{ participantId: null, tempShare:null, tempPaid:null }];
+  urlGroupId:string | null = null;
+  urlMyParticipantId:string | null = null;
 
-  constructor(public eServ:ExpenseService, public gServ:GroupService, private route:ActivatedRoute)
+  constructor(public eServ:ExpenseService, public gServ:GroupService, private route:ActivatedRoute, private router:Router)
   {
     this.getGroupInfo();
   }
 
   getGroupInfo()
   {
+    this.urlGroupId = this.route.snapshot.paramMap.get("id");
+    this.urlMyParticipantId = this.route.snapshot.paramMap.get("partId");
     if(!this.gServ.openedGroup)
     {
-      const id = this.route.snapshot.paramMap.get("id");
-      const partId = this.route.snapshot.paramMap.get("partId");
-      this.gServ.getGroupDetail(id, partId).subscribe(
+      this.gServ.getGroupDetail(this.urlGroupId, this.urlMyParticipantId).subscribe(
           (resp) =>
           {
             this.gServ.openedGroup = resp;
-            this.initializeParticipantMap();
           }
         );
     }
-    else{
-      this.initializeParticipantMap();
-    }
   }
 
-  initializeParticipantMap()
+  salva()
   {
-    for(const p of this.gServ.openedGroup!.participants)
+    if(this.fillCheck())
     {
-      this.expensePost.expenseParticipants[p.participantId] = {paidAmount:null, share:null};
+      this.fillExpenseParticipants();
+      return this.eServ.addExpense(this.gServ.openedGroup!.groupId, this.expensePost).subscribe(
+        () => this.router.navigate(["/group-detail", this.urlGroupId, this.urlMyParticipantId])
+      );
+    }
+    return;
+  }
+
+  fillExpenseParticipants()
+  {
+    for(const row of this.expenseRows)
+    {
+      if(row.participantId)
+        this.expensePost.expenseParticipants[row.participantId] = {paidAmount:row.tempPaid, share:row.tempShare};
     }
   }
 
   addExpenseParticipant()
   {
     if(this.maxParticipantCheck())
-      this.expenseRows.push({ participantId: null, tempShare:null, tempPaid:null  });
+      this.expenseRows.push({ participantId: null, tempShare:null, tempPaid:null });
   }
 
   maxParticipantCheck()
@@ -63,49 +74,17 @@ export class ExpenseForm {
     return this.expenseRows.length < this.gServ.openedGroup!.participants.length;
   }
 
-  onParticipantChange(row:ExpenseRow)
+  // onSelectChange(partId:string | null)
+  // {
+  //   if(!partId)
+  //     return;
+  //   for(const row of this.expenseRows)
+  //     if(partId === row.participantId)
+
+  // }
+
+  fillCheck()
   {
-    if(!row.participantId)
-      return;
-    const participant = this.expensePost.expenseParticipants[row.participantId];
-    if (row.tempShare !== null) {
-      participant.share = row.tempShare;
-    }
-
-    if (row.tempPaid !== null) {
-      participant.paidAmount = row.tempPaid;
-    }
-  }
-
-  getShare(row: any): number | null {
-    // if (!row.participantId) return row.tempShare;
-    // return this.expensePost.expenseParticipants[row.participantId].share;
-    return row.tempShare;
-  }
-
-  setShare(row: any, value: number) {
-    if (!row.participantId)
-    {
-      row.tempShare = value;
-      return;
-    }
-    row.tempShare = value;
-    this.expensePost.expenseParticipants[row.participantId].share = value;
-  }
-
-  getPaid(row: any): number | null {
-    // if (!row.participantId) return row.tempPaid;
-    // return this.expensePost.expenseParticipants[row.participantId].paidAmount;
-    return row.tempPaid;
-  }
-
-  setPaid(row: any, value: number) {
-    if (!row.participantId)
-    {
-      row.tempPaid = value;
-      return;
-    }
-    row.tempPaid = value;
-    this.expensePost.expenseParticipants[row.participantId].paidAmount = value;
+    return this.expensePost.title && this.expensePost.title.trim().length > 0 && this.expensePost.date && this.expenseRows.every(r => r.participantId && r.tempPaid && r.tempShare && r.tempPaid > 0 && r.tempShare > 0);
   }
  }

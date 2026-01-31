@@ -5,10 +5,7 @@ DATA: <input type="date" [(ngModel)]="expensePost.date"/>
 <br/>
 PARTECIPANTI ALLA SPESA:<br/>
 @for (row of expenseRows; track $index) {
-        <select
-            [(ngModel)]="row.participantId"
-            (ngModelChange)="onParticipantChange(row)"
-        >
+        <select [(ngModel)]="row.participantId">
             <option hidden [ngValue]="null">SELEZIONA PARTECIPANTE</option>
             @for (p of gServ.openedGroup?.participants; track p.participantId) {
                 <option [ngValue]="p.participantId">{{p.participantName}}</option>
@@ -17,16 +14,17 @@ PARTECIPANTI ALLA SPESA:<br/>
     <input
     type="number"
     placeholder="Dovuto"
-    [ngModel]="getShare(row)"
-    (ngModelChange)="setShare(row, $event)"
+    [(ngModel)]="row.tempShare"
     />
 
     <input
     type="number"
     placeholder="Pagato"
-    [ngModel]="getPaid(row)"
-    (ngModelChange)="setPaid(row, $event)"
+    [(ngModel)]="row.tempPaid"
     />
     <br/>
 }
 <button (click)="addExpenseParticipant()" [disabled]="!maxParticipantCheck()">AGGIUNGI PARTECIPANTE</button>
+<br/>
+<br/>
+<button (click)="salva()" [disabled]="!fillCheck()">SALVA SPESA</button>

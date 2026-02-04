@@ -28,7 +28,10 @@ PARTECIPANTI ALLA SPESA:<br/>
     }
     <br/>
 }
+@if(maxParticipantCheck())
+{
 <button (click)="addExpenseParticipant()" [disabled]="!maxParticipantCheck()">AGGIUNGI PARTECIPANTE</button>
 <br/>
+}
 <br/>
 <button (click)="salva()" [disabled]="!fillCheck()">SALVA SPESA</button>

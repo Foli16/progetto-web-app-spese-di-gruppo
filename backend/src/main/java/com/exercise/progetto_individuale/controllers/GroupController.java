@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.exercise.progetto_individuale.dtos.Views;
-import com.exercise.progetto_individuale.dtos.input_dtos.InputExpenseDto;
 import com.exercise.progetto_individuale.dtos.input_dtos.InputGroupDto;
 import com.exercise.progetto_individuale.dtos.output_dtos.OutputGroupDto;
-import com.exercise.progetto_individuale.services.ExpenseService;
 import com.exercise.progetto_individuale.services.GroupService;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -27,8 +25,6 @@ public class GroupController
 {
     @Autowired
     private GroupService gServ;
-    @Autowired
-    private ExpenseService eServ;
 
     @PostMapping("create")
     public UUID createNewGroup(@RequestBody InputGroupDto dto, @CookieValue(required = false) String token)
@@ -45,11 +41,6 @@ public class GroupController
     //     gServ.addParticipant(groupId, participantName);
     // }
 
-    @PostMapping("{groupId}/addexpense")
-    public void addExpense(@PathVariable UUID groupId, @RequestBody InputExpenseDto dto)
-    {
-        eServ.addExpense(groupId, dto);
-    }
 
     @PostMapping("list")
     @JsonView(Views.Preview.class)
@@ -67,10 +58,4 @@ public class GroupController
     {
         return gServ.getGroupDetail(groupId, myParticipantId, token);
     }
-
-    // @GetMapping("list")
-    // public List<OutputGroupDto> getGroupList(@CookieValue(required = false) String token, @RequestBody(required = false) String[] participantIds)
-    // {
-    //     return gServ.getGroupList(token, participantIds);
-    // }
 }

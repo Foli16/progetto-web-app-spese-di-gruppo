@@ -14,7 +14,6 @@ export type GroupDetailGet = GroupPreviewGet &
         expenseTitle:string,
         amount:number,
         date:string,
-        creationTime:Date,
         expenseParticipants:
         {
             expenseParticipantName:string,

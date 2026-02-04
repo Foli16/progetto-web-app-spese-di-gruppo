@@ -4,17 +4,16 @@ import { GroupPreviewGet } from '../../../model/GroupPreviewGet';
 import { GroupDetailGet } from '../../../model/GroupDetailGet';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { ExpenseDetail } from "../expense-detail/expense-detail";
 
 @Component({
   selector: 'app-group-detail',
-  imports: [],
+  imports: [ExpenseDetail],
   templateUrl: './group-detail.html',
   styleUrl: './group-detail.css',
 })
 export class GroupDetail {
   
-  // group:GroupDetailGet | null = null;
-  // basicInfo:GroupPreviewGet | null = null;
   
   constructor(public serv:GroupService, private route:ActivatedRoute, public router:Router)
   {

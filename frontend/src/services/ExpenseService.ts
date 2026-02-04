@@ -12,6 +12,6 @@ export class ExpenseService {
 
   addExpense(groupId:string, body:ExpensePost)
   {
-    return this.http.post("api/groups/"+groupId+"/addexpense", body);
+    return this.http.post("api/groups/expenses/"+groupId+"/add", body);
   }
 }

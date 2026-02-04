@@ -4,15 +4,15 @@
   <span>Spese totali: {{serv.openedGroup.groupTotalExpenses}} €</span>
   -
   <span>Spese personali: {{serv.openedGroup.myParticipantTotalExpenses}} €</span>
+  -
+  <span>Saldo personale: {{serv.openedGroup.myParticipantBalance}} €</span>
 </div>
 
 @for(e of serv.openedGroup.expenses; track $index)
 {
     <div class="card mx-auto" style="width: 300px;">
   <a style="cursor: pointer;">
-    <div class="card-body">
-      {{e.expenseTitle}} {{e.amount}} {{e.date}}
-    </div>
+       <app-expense-detail [expense]="e" [index]="$index"></app-expense-detail>
   </a>
 </div>
 }

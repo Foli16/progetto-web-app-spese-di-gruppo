@@ -35,13 +35,6 @@ public class GroupController
             return gServ.createGroup(dto).getId();
     }
 
-    // @PostMapping("{groupId}/addparticipant/{participantName}")
-    // public void addParticipant(@PathVariable UUID groupId, @PathVariable String participantName)
-    // {
-    //     gServ.addParticipant(groupId, participantName);
-    // }
-
-
     @PostMapping("list")
     @JsonView(Views.Preview.class)
     public List<OutputGroupDto> getGroupList(@CookieValue(required = false) String token, @RequestBody(required = false) Set<UUID> participantIds)

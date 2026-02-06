@@ -5,10 +5,11 @@ import { GroupDetailGet } from '../../../model/GroupDetailGet';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ExpenseDetail } from "../expense-detail/expense-detail";
+import { ParticipantsList } from "../participants-list/participants-list";
 
 @Component({
   selector: 'app-group-detail',
-  imports: [ExpenseDetail],
+  imports: [ExpenseDetail, ParticipantsList],
   templateUrl: './group-detail.html',
   styleUrl: './group-detail.css',
 })

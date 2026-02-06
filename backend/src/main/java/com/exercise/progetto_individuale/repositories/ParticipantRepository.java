@@ -15,4 +15,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, UUID>
     Optional<Participant> findParticipantByIdAndSpendingGroup(UUID id, SpendingGroup sg);
 
     List<Participant> findAllByIdInAndSpendingGroup(Collection<UUID> ids, SpendingGroup sg);
+
+    boolean existsByNameAndSpendingGroup(String name, SpendingGroup sg);
 }

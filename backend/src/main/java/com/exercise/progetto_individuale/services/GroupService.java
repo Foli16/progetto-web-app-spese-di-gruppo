@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.exercise.progetto_individuale.dtos.input_dtos.InputGroupDto;
-import com.exercise.progetto_individuale.dtos.input_dtos.InputParticipantDto;
 import com.exercise.progetto_individuale.dtos.output_dtos.OutputExpenseDto;
 import com.exercise.progetto_individuale.dtos.output_dtos.OutputExpenseParticipantDto;
 import com.exercise.progetto_individuale.dtos.output_dtos.OutputGroupDto;
@@ -27,7 +26,6 @@ import com.exercise.progetto_individuale.entities.SpendingGroup;
 import com.exercise.progetto_individuale.entities.User;
 import com.exercise.progetto_individuale.exceptions.GroupAccessDeniedException;
 import com.exercise.progetto_individuale.exceptions.LocalStorageErrorException;
-import com.exercise.progetto_individuale.exceptions.UniqueNameCostraintException;
 import com.exercise.progetto_individuale.repositories.GroupUserRepository;
 import com.exercise.progetto_individuale.repositories.ParticipantRepository;
 import com.exercise.progetto_individuale.repositories.SpendingGroupRepository;
@@ -46,6 +44,8 @@ public class GroupService
     private GroupUserRepository gUserRepo;
     @Autowired
     private UserRepository uRepo;
+    @Autowired
+    private ParticipantService pServ;
 
     // METODI DI CREAZIONE GRUPPO
 
@@ -53,7 +53,7 @@ public class GroupService
     {
         SpendingGroup sg = new SpendingGroup(dto.getName());
 
-        return createAndAddParticipants(dto.getParticipants(), sg);
+        return pServ.addParticipantsToNewGroup(dto.getParticipants(), sg);
     }
 
     public UUID createUserLinkedGroup(InputGroupDto dto, String token)
@@ -74,62 +74,6 @@ public class GroupService
 
         return null;
     }
-
-    private Participant createAndAddParticipants(List<InputParticipantDto> dtos, SpendingGroup sg)
-    {
-        List<Participant> participants = new ArrayList<>();
-
-        String lastName = "";
-        int counter = 0;
-        for(InputParticipantDto partDto : dtos)
-        {
-            if(partDto.getName() == null || partDto.getName().isBlank())
-                throw new RuntimeException("Participants' name must not be blank or null");
-            Participant p = new Participant(partDto.getName());
-            if(lastName.equalsIgnoreCase(p.getName()))
-                throw new UniqueNameCostraintException();
-            if(partDto.isFounder())
-            {
-                counter++;
-                p.setFounder(partDto.isFounder());
-            }
-            lastName = p.getName();
-            participants.add(p);
-        }
-        if(counter != 1)
-            throw new RuntimeException("There must be one founder per group");
-        participants = partRepo.saveAll(participants);
-
-        Participant myParticipant = null;
-        for(Participant p : participants)
-        {
-            sg.addParticipant(p);
-            if(p.isFounder())
-                myParticipant = p;
-        }
-        sgRepo.save(sg);
-        return myParticipant;
-    }
-
-    // public void addParticipant(SpendingGroup sg, String participantName)
-    // {
-    //     Participant p = new Participant(participantName);
-    //     p = partRepo.save(p);
-    //     sg.addParticipant(p);
-    //     sgRepo.save(sg);
-    // }
-
-    // public void addParticipant(UUID id, String participantName)
-    // {
-    //     Optional<SpendingGroup> op = sgRepo.findById(id);
-    //     if(op.isEmpty())
-    //         throw new RuntimeException("Inexistent group");
-    //     SpendingGroup sg = op.get();
-    //     Participant p = new Participant(participantName);
-    //     p = partRepo.save(p);
-    //     sg.addParticipant(p);
-    //     sgRepo.save(sg);
-    // }
 
     // METODI GET PER I GRUPPI
 
@@ -197,10 +141,8 @@ public class GroupService
 
     public OutputGroupDto getGroupDetail(UUID groupId, UUID myParticipantId, String token)
     {
-        Optional<SpendingGroup> gOp = sgRepo.findById(groupId);
-        if(gOp.isEmpty())
-            throw new RuntimeException("Group not found");
-        Optional<Participant> pOp = partRepo.findParticipantByIdAndSpendingGroup(myParticipantId, gOp.get());
+        SpendingGroup sg = findSpendingGroupById(groupId);
+        Optional<Participant> pOp = partRepo.findParticipantByIdAndSpendingGroup(myParticipantId, sg);
         if(pOp.isEmpty())
             throw new RuntimeException("Participant not existent or not present in group");
         if(token != null)
@@ -211,9 +153,9 @@ public class GroupService
                 throw new GroupAccessDeniedException();
         }
         else
-            if(!gOp.get().getMyParticipant().equals(pOp.get()) || pOp.get().getGroupUser() != null)
+            if(!sg.getMyParticipant().equals(pOp.get()) || pOp.get().getGroupUser() != null)
                 throw new GroupAccessDeniedException();
-        return convertToGroupDetailDto(gOp.get(), pOp.get());
+        return convertToGroupDetailDto(sg, pOp.get());
     }
 
     // METODI DI CONVERSIONE IN DTO PER LA PREVIEW DEI GRUPPI
@@ -287,5 +229,13 @@ public class GroupService
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    public SpendingGroup findSpendingGroupById(UUID groupId)
+    {
+        Optional<SpendingGroup> gOp = sgRepo.findById(groupId);
+        if(gOp.isEmpty())
+            throw new RuntimeException("Group not found");
+        return gOp.get();
     }
 }

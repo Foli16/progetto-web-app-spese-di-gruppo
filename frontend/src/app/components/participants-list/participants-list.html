@@ -1,0 +1,13 @@
+<h3 style="text-align: center;">Partecipanti</h3>
+@for(p of participants; track $index)
+{
+    <div class="card mx-auto" style="width: 300px;">
+        {{p.participantName}}
+    </div>
+}
+<div style="text-align: center;">
+    <button>AGGIUNGI NUOVO PARTECIPANTE</button>
+    <br/>
+    <br/>
+    <button>SALVA</button>
+</div>

@@ -1,7 +1,6 @@
 package com.exercise.progetto_individuale.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +27,12 @@ public class ExpenseService
     private ParticipantRepository partRepo;
     @Autowired
     private ExpenseRepository expRepo;
+    @Autowired
+    private GroupService gServ;
 
     public void addExpense(UUID spendinGroupId, InputExpenseDto dto)
     {
-        Optional<SpendingGroup> sgOp = sgRepo.findById(spendinGroupId);
-        if(sgOp.isEmpty())
-            throw new RuntimeException("Inexistent group");
-        SpendingGroup sg = sgOp.get();
+        SpendingGroup sg = gServ.findSpendingGroupById(spendinGroupId);
 
         convertToExpenseAndSave(dto, sg);
     }

@@ -1,28 +1,41 @@
 @if (serv.openedGroup) {
-<h3 style="text-align: center; margin-bottom: 30px; margin-top: 30px;">{{serv.openedGroup.groupName}}</h3>
-<div style="text-align: center; margin-bottom: 30px;">
-  <span>Spese totali: {{serv.openedGroup.groupTotalExpenses}} €</span>
-  -
-  <span>Spese personali: {{serv.openedGroup.myParticipantTotalExpenses}} €</span>
-  -
-  <span>Saldo personale: {{serv.openedGroup.myParticipantBalance}} €</span>
-</div>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h3 style="text-align: center; margin-bottom: 30px; margin-top: 30px;">{{serv.openedGroup.groupName}}</h3>
+        <div style="text-align: center; margin-bottom: 30px;">
+          <span>Spese totali: {{serv.openedGroup.groupTotalExpenses}} €</span>
+          -
+          <span>Spese personali: {{serv.openedGroup.myParticipantTotalExpenses}} €</span>
+          -
+          <span>Saldo personale: {{serv.openedGroup.myParticipantBalance}} €</span>
+        </div>
 
-@for(e of serv.openedGroup.expenses; track $index)
-{
-    <div class="card mx-auto" style="width: 300px;">
-  <a style="cursor: pointer;">
-       <app-expense-detail [expense]="e" [index]="$index"></app-expense-detail>
-  </a>
-</div>
+        @for(e of serv.openedGroup.expenses; track $index)
+        {
+          <div class="card mx-auto" style="width: 500px;">
+                <app-expense-detail [expense]="e" [index]="$index"></app-expense-detail>
+          </div>
+        }
+        <br/>
+        <div style="text-align: center;">
+          <button (click)="openExpenseForm(serv.openedGroup.groupId, serv.openedGroup.myParticipantId)">AGGIUNGI SPESA</button>
+        </div>
+        <br/>
+        <div style="text-align: center;">
+          <button (click)="router.navigate(['/'])">TORNA A LISTA</button>
+        </div>
+      </div>
+      <div class="col-3 position-fixed end-0 mt-5">
+          <app-participants-list [participants]="serv.openedGroup.participants"></app-participants-list>
+      </div>
+    </div>
+  </div>
 }
-<br/>
-<div style="text-align: center;">
-  <button (click)="openExpenseForm(serv.openedGroup.groupId, serv.openedGroup.myParticipantId)">AGGIUNGI SPESA</button>
-</div>
-<br/>
-<div style="text-align: center;">
-  <button (click)="router.navigate(['/'])">TORNA A LISTA</button>
-</div>
+@else {
+  <div style="margin-top: 30px;" class="d-flex justify-content-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
 }
-@else {}

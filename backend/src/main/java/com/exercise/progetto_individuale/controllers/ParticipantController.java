@@ -1,5 +1,6 @@
 package com.exercise.progetto_individuale.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,19 +10,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.exercise.progetto_individuale.dtos.input_dtos.InputExpenseDto;
-import com.exercise.progetto_individuale.services.ExpenseService;
+import com.exercise.progetto_individuale.dtos.input_dtos.InputParticipantDto;
+import com.exercise.progetto_individuale.services.ParticipantService;
 
 @RestController
-@RequestMapping("api/groups/{groupId}/expenses")
-public class ExpenseController {
-
+@RequestMapping("api/groups/{groupId}/participants")
+public class ParticipantController {
     @Autowired
-    private ExpenseService eServ;
+    private ParticipantService pServ;
 
     @PostMapping("add")
-    public void addExpense(@PathVariable UUID groupId, @RequestBody InputExpenseDto dto)
+    public void addParticipantsToExistingGroup(@PathVariable UUID groupId, @RequestBody List<InputParticipantDto> dtos)
     {
-        eServ.addExpense(groupId, dto);
+        pServ.addParticipantsToExistingGroup(groupId, dtos);
     }
 }
